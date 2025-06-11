@@ -1,0 +1,782 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sassy String - Elegant Shopping & Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900 min-h-screen flex flex-col">
+
+  <header role="banner" aria-label="Main header" class="sticky top-0 bg-white shadow-md z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+      <div class="text-4xl font-extrabold text-gray-900 select-none cursor-default" tabindex="0" aria-label="Sassy String logo">Sassy String</div>
+      <nav aria-label="Primary navigation" class="flex space-x-8 text-sm font-semibold uppercase tracking-widest text-gray-500">
+        <button type="button" id="nav-shop" aria-current="page" class="border-b-4 border-blue-600 text-blue-800 focus:outline-none focus:border-blue-800">Shop</button>
+        <button type="button" id="nav-dashboard" class="hover:text-blue-600 focus:outline-none focus:text-blue-600">Dashboard</button>
+        <button type="button" id="nav-about" class="hover:text-blue-600 focus:outline-none focus:text-blue-600">About Us</button>
+      </nav>
+      <button id="cart-btn" aria-label="View cart items" title="Cart" tabindex="0" class="relative text-2xl text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 transition-transform transform hover:scale-110 focus:scale-110 ml-6">
+        <i class="fas fa-shopping-cart"></i>
+        <span id="cart-count" class="absolute -top-2 -right-3 bg-red-600 text-white rounded-full text-xs font-bold px-2 leading-none shadow-lg" aria-live="polite" aria-atomic="true">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-7xl mx-auto px-6 py-10 w-full" role="main" aria-label="Shopping web application">
+
+    <!-- SHOP VIEW -->
+    <section id="shop-view" class="view block" aria-label="Shop view">
+      <section id="search-container" aria-label="Search products" class="flex justify-center mb-10">
+        <input id="search-input" type="search" placeholder="Search items..." aria-controls="items-container" aria-describedby="search-desc" autocomplete="off" 
+          class="w-full max-w-md px-4 py-3 border border-gray-300 rounded-xl text-lg placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition" />
+        <span id="search-desc" class="sr-only">Search items by name</span>
+      </section>
+      <section id="items-container" aria-live="polite" aria-label="Items listing" tabindex="0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-center max-w-7xl mx-auto">
+        <!-- Items will be dynamically inserted here -->
+      </section>
+    </section>
+
+    <!-- DASHBOARD VIEW -->
+    <section id="dashboard-view" class="view hidden" aria-label="Dashboard view" tabindex="0" aria-hidden="true">
+      <h2 class="text-4xl font-extrabold mb-8 text-gray-900 select-none">Dashboard</h2>
+      <button id="dashboard-add-button" aria-haspopup="dialog" aria-controls="modal-add-item-overlay" aria-expanded="false" aria-label="Add new item" 
+        class="mb-8 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-400 transition">
+        + Add New Item
+      </button>
+      <div class="overflow-x-auto">
+        <table aria-describedby="dashboard-desc" aria-label="List of items in dashboard" class="w-full border-separate border-spacing-y-6 text-left text-gray-700">
+          <thead>
+            <tr class="text-gray-500 font-semibold text-sm border-b border-gray-300 select-none">
+              <th scope="col" class="pl-6 py-3">Name</th>
+              <th scope="col" class="py-3">Quantity</th>
+              <th scope="col" class="py-3">Unit</th>
+              <th scope="col" class="py-3">Price (PHP)</th>
+              <th scope="col" class="py-3">Image</th>
+              <th scope="col" class="pr-6 py-3 w-72">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="dashboard-table-body" class="text-base">
+            <!-- Dashboard items inserted here -->
+          </tbody>
+        </table>
+      </div>
+      <p id="dashboard-desc" class="sr-only">This table lists all items with controls to edit, delete, view details, or print each item.</p>
+    </section>
+
+    <!-- ABOUT US VIEW -->
+    <section id="about-us-view" class="view hidden" aria-label="About Us" tabindex="0" aria-hidden="true">
+      <div class="max-w-3xl mx-auto bg-gray-50 p-8 rounded-xl shadow-md text-gray-800">
+        <h2 class="text-3xl font-extrabold mb-4 text-teal-700 select-none">🌴 SASSY STRINGS — PRODUCT PITCH SHEET</h2>
+        <p class="italic text-teal-600 mb-6">Handmade Bead Accessories Inspired by Island Life</p>
+        <hr class="border-gray-300 mb-6" />
+        
+        <h2 class="text-2xl font-bold mb-4 text-teal-800 select-none">🌟 About Sassy Strings</h2>
+        <p class="mb-4">Born from salty air, sun-kissed skin, and long walks along the shores of Siargao, Sassy Strings was created by a Filipina with a heart full of island dreams and creativity.</p>
+        <p class="mb-4">As a spiritually grounded woman who values beauty in simplicity, I started crafting bead accessories as a way to express my love for art, color, and joyful connection.</p>
+        <p class="mb-4">Each bracelet I make is more than an accessory—it’s a tiny story of the sea, a reflection of my roots, and a celebration of the vibrant, tropical life we’re blessed to live.</p>
+        <p class="mb-6 font-semibold text-orange-500">✨ Handmade with purpose. Designed with soul. Inspired by the islands.</p>
+        <hr class="border-gray-300 mb-6" />
+        
+        <h3 class="text-xl font-semibold mb-3 text-teal-700 select-none">🌺 COLLECTION HIGHLIGHTS</h3>
+        <p class="mb-4"><strong>🌴 Island Charm</strong><br/>A true slice of paradise—this bracelet features a delicate mix of ocean-toned beads and authentic shell accents. It captures the calm, carefree vibe of Siargao sunsets and salty air.</p>
+        <p class="mb-4"><strong>🌊 Ocean Breeze Twist</strong><br/>Braided like the waves and infused with sea spirit. Blends seafoam greens, aquas, and blues—perfect for free spirits and ocean chasers.</p>
+        <p class="mb-4"><strong>💖 Sunset Stackables (3-in-1)</strong><br/>Three bracelets, one bold tropical statement. Warm beachy tones—corals, golds, twilight pinks. Wear together or mix & match.</p>
+        <p class="mb-4"><strong>📿 Personalized Name Bracelets</strong><br/>Spell your story! Custom name, location, or island words. A meaningful, wearable souvenir.</p>
+        <p class="mb-4"><strong>💎 Gemstone Touch</strong><br/>Features semi-precious stones like turquoise, lava rock, or quartz—each chosen for its natural island energy.</p>
+        <p class="mb-4"><strong>🌾 Native Inspired</strong><br/>Uses traditional Filipino patterns, wooden beads, and earthy tones—rooted in heritage.</p>
+        <p class="mb-4"><strong>🌈 Vibrant Colors Collection</strong><br/>Bright and joyful! Designed for beach parties, fiestas, and playful island souls.</p>
+        <p class="mb-6"><strong>🐚 Pearl in Strings</strong><br/>A dainty beach classic. Delicate pearls woven into colorful thread—elegant, breezy, and tropical.</p>
+        <hr class="border-gray-300 mb-6" />
+        
+        <h3 class="text-xl font-semibold mb-3 text-teal-700 select-none">🛍️ IDEAL FOR:</h3>
+        <ul class="list-disc list-inside mb-6 space-y-1">
+          <li>Souvenir Shops</li>
+          <li>Surf Boutiques</li>
+          <li>Gift & Craft Stores</li>
+          <li>Resorts & Hotel Lobbies</li>
+          <li>Wellness & Yoga Studios</li>
+        </ul>
+        <hr class="border-gray-300 mb-6" />
+        
+        <h3 class="text-xl font-semibold mb-3 text-teal-700 select-none">📦 CONSIGNMENT OPTION</h3>
+        <p class="mb-4">We’re excited to partner with local Siargao shops and businesses!<br/>Sassy Strings offers:</p>
+        <ul class="list-disc list-inside mb-6 space-y-1">
+          <li>Flexible consignment terms</li>
+          <li>Low minimum order quantity</li>
+          <li>Free display card designs</li>
+          <li>Consistent restocks during tourist season</li>
+        </ul>
+        <p class="mb-6">📧 Inquiries: sassystrings.siargao@gmail.com<br/>📸 Instagram: @sassy.strings</p>
+        <hr class="border-gray-300 mb-6" />
+        
+        <h3 class="text-xl font-semibold mb-3 text-teal-700 select-none">🖼️ PRODUCT PHOTOS</h3>
+        <p class="mb-6">Images available via:<br/>Google Drive (link upon request)<br/>Instagram Highlights: @sassy.strings</p>
+        <hr class="border-gray-300 mb-6" />
+        
+        <h3 class="text-xl font-semibold mb-3 text-teal-700 select-none">💬 LET'S WORK TOGETHER</h3>
+        <p>We believe in supporting local, creating meaningful products, and sharing joy through handmade art. We'd love to see Sassy Strings featured in your shop!</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer role="contentinfo" aria-label="Footer with social media and contact information" class="bg-white border-t border-gray-200">
+    <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4 text-gray-500 font-semibold text-sm">
+      <div class="flex space-x-6" aria-label="Social media links">
+        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook" class="hover:text-blue-600 focus:outline-none focus:text-blue-600 transition">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4v-3a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube" class="hover:text-red-600 focus:outline-none focus:text-red-600 transition">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="9 7 15 12 9 17 9 7"/></svg>
+        </a>
+      </div>
+      <div>&copy; 2024 Sassy String. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <!-- Modal: Add New / Edit Item -->
+  <div id="modal-add-item-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-add-item-title" tabindex="-1">
+    <div class="bg-white rounded-xl max-w-lg w-full p-8 relative shadow-2xl flex flex-col gap-6 max-h-[90vh] overflow-y-auto">
+      <button id="modal-add-item-close" aria-label="Close add item modal" class="absolute top-4 right-5 text-gray-500 hover:text-red-600 focus:outline-none focus:text-red-600 text-3xl font-bold select-none">&times;</button>
+      <h2 id="modal-add-item-title" class="text-2xl font-bold text-gray-900">Add New Item</h2>
+      <p id="modal-add-item-desc" class="sr-only">Form to add or edit an item with its name, description, quantity, unit, price (PHP), and image URL to display.</p>
+      <form id="modal-add-item-form" class="flex flex-col gap-4" novalidate>
+        <label for="add-name" class="font-semibold text-gray-800">Name *</label>
+        <input type="text" id="add-name" name="add-name" placeholder="Item name" required aria-required="true" autocomplete="off" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+
+        <label for="add-description" class="font-semibold text-gray-800">Description</label>
+        <textarea id="add-description" name="add-description" placeholder="Item description" rows="3" aria-label="Item description" class="border border-gray-300 rounded-lg px-4 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+
+        <label for="add-quantity" class="font-semibold text-gray-800">Quantity *</label>
+        <input type="number" id="add-quantity" name="add-quantity" placeholder="Quantity" min="0" step="1" required aria-required="true" autocomplete="off" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+
+        <label for="add-unit" class="font-semibold text-gray-800">Unit *</label>
+        <input type="text" id="add-unit" name="add-unit" placeholder="e.g. pcs, box" required aria-required="true" autocomplete="off" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+
+        <label for="add-price-php" class="font-semibold text-gray-800">Price (PHP) *</label>
+        <input type="number" id="add-price-php" name="add-price-php" placeholder="Price in PHP" min="0" step="0.01" required aria-required="true" autocomplete="off" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+
+        <label for="add-image" class="font-semibold text-gray-800">Image URL *</label>
+        <input type="url" id="add-image" name="add-image" placeholder="Image URL" required aria-required="true" autocomplete="off" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+
+        <div class="flex justify-end gap-4 mt-4">
+          <button type="submit" aria-label="Save item" class="bg-blue-600 text-white font-bold px-6 py-2 rounded-xl shadow hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-400 transition">Save Item</button>
+          <button type="button" id="modal-add-item-cancel" class="bg-red-600 text-white font-bold px-6 py-2 rounded-xl shadow hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-400 transition">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Item Details -->
+  <div id="modal-details-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
+    <div class="bg-white rounded-xl max-w-md w-full p-8 relative shadow-2xl flex flex-col gap-6 max-h-[90vh] overflow-y-auto">
+      <button id="modal-details-close" aria-label="Close details modal" class="absolute top-4 right-5 text-gray-500 hover:text-red-600 focus:outline-none focus:text-red-600 text-3xl font-bold select-none">&times;</button>
+      <h2 id="modal-title" class="text-2xl font-bold text-gray-900"></h2>
+      <img id="modal-image" src="" alt="" class="w-full rounded-lg object-contain mb-5" />
+      <p id="modal-description" class="text-gray-700"></p>
+      <p id="modal-quantity" class="text-gray-700 font-semibold"></p>
+      <p id="modal-unit" class="text-gray-700 font-semibold"></p>
+      <p id="modal-price-php" class="text-green-600 font-extrabold text-lg"></p>
+      <div class="mt-6">
+        <button id="modal-add-cart" type="button" class="bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 text-gray-900 font-bold px-6 py-3 rounded-xl shadow transition w-full">
+          Add to Cart 🛒
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Login -->
+  <div id="modal-login-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-login-title" tabindex="-1">
+    <div id="modal-login" role="document" aria-describedby="modal-login-desc" class="bg-white rounded-xl max-w-sm w-full p-8 relative shadow-2xl flex flex-col gap-6">
+      <button id="modal-login-close" aria-label="Close login modal" class="absolute top-4 right-5 text-gray-500 hover:text-red-600 focus:outline-none focus:text-red-600 text-3xl font-bold select-none">&times;</button>
+      <h2 id="modal-login-title" class="text-2xl font-bold text-gray-900 text-center">Dashboard Login</h2>
+      <p id="modal-login-desc" class="sr-only">Enter username and password to access the dashboard.</p>
+      <form id="login-form" novalidate class="flex flex-col gap-4">
+        <label for="login-username" class="font-semibold text-gray-800">Username</label>
+        <input type="text" id="login-username" name="login-username" autocomplete="username" required aria-required="true" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        <label for="login-password" class="font-semibold text-gray-800">Password</label>
+        <input type="password" id="login-password" name="login-password" autocomplete="current-password" required aria-required="true" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        <div id="login-error" class="text-red-600 text-sm text-center" aria-live="assertive" aria-atomic="true"></div>
+        <button type="submit" class="bg-blue-600 text-white font-bold px-6 py-3 rounded-xl shadow hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-400 transition">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+(() => {
+  // DOM Elements
+  const shopView = document.getElementById('shop-view');
+  const dashboardView = document.getElementById('dashboard-view');
+  const aboutView = document.getElementById('about-us-view');
+  const navShop = document.getElementById('nav-shop');
+  const navDashboard = document.getElementById('nav-dashboard');
+  const navAbout = document.getElementById('nav-about');
+  const dashboardTableBody = document.getElementById('dashboard-table-body');
+  const dashboardAddButton = document.getElementById('dashboard-add-button');
+
+  const itemsContainer = document.getElementById('items-container');
+  const searchInput = document.getElementById('search-input');
+  const cartCountEl = document.getElementById('cart-count');
+
+  // Modal Add Item
+  const addModalOverlay = document.getElementById('modal-add-item-overlay');
+  const addModalCloseBtn = document.getElementById('modal-add-item-close');
+  const addModalForm = document.getElementById('modal-add-item-form');
+  const addModalCancelBtn = document.getElementById('modal-add-item-cancel');
+  const addNameInput = document.getElementById('add-name');
+  const addDescriptionInput = document.getElementById('add-description');
+  const addQuantityInput = document.getElementById('add-quantity');
+  const addUnitInput = document.getElementById('add-unit');
+  const addPricePhpInput = document.getElementById('add-price-php');
+  const addImageInput = document.getElementById('add-image');
+
+  // Modal Details
+  const detailsModalOverlay = document.getElementById('modal-details-overlay');
+  const detailsModalCloseBtn = document.getElementById('modal-details-close');
+  const modalTitle = document.getElementById('modal-title');
+  const modalImage = document.getElementById('modal-image');
+  const modalDescription = document.getElementById('modal-description');
+  const modalQuantity = document.getElementById('modal-quantity');
+  const modalUnit = document.getElementById('modal-unit');
+  const modalPricePhp = document.getElementById('modal-price-php');
+  const modalAddCartBtn = document.getElementById('modal-add-cart');
+
+  // Modal Login
+  const loginModalOverlay = document.getElementById('modal-login-overlay');
+  const loginModalCloseBtn = document.getElementById('modal-login-close');
+  const loginForm = document.getElementById('login-form');
+  const loginUsernameInput = document.getElementById('login-username');
+  const loginPasswordInput = document.getElementById('login-password');
+  const loginError = document.getElementById('login-error');
+
+  // IndexedDB setup
+  const dbName = 'SassyStringDB';
+  const storeName = 'itemsStore';
+  let db, items = [];
+
+  let currentEditingItem = null;
+
+  // Authentication state
+  let isAuthenticated = false;
+
+  // Open IndexedDB
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(dbName, 1);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        db = request.result;
+        resolve(db);
+      };
+      request.onupgradeneeded = (e) => {
+        db = e.target.result;
+        if (!db.objectStoreNames.contains(storeName)) {
+          db.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
+        }
+      };
+    });
+  }
+
+  // Add or update item in DB - fix for id handling
+  function putItem(item) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, 'readwrite');
+      const store = tx.objectStore(storeName);
+      let request;
+      if (item.id === undefined || item.id === null) {
+        const copy = { ...item };
+        delete copy.id;
+        request = store.add(copy);
+        request.onsuccess = e => {
+          item.id = e.target.result;
+          resolve(item.id);
+        };
+      } else {
+        request = store.put(item);
+        request.onsuccess = e => resolve(e.target.result);
+      }
+      request.onerror = e => reject(e.target.error);
+    });
+  }
+
+  // Load all items from DB
+  function loadItemsFromDB() {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, 'readonly');
+      const store = tx.objectStore(storeName);
+      const request = store.getAll();
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = e => reject(e.target.error);
+    });
+  }
+
+  // Delete item by id
+  function deleteItem(id) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, 'readwrite');
+      const store = tx.objectStore(storeName);
+      const request = store.delete(id);
+      request.onsuccess = () => resolve();
+      request.onerror = e => reject(e.target.error);
+    });
+  }
+
+  // Render shop items grid
+  function renderShopItems(filter = '') {
+    const search = filter.trim().toLowerCase();
+    itemsContainer.innerHTML = '';
+
+    if (items.length === 0) {
+      const noItems = document.createElement('p');
+      noItems.textContent = 'No items available. Please add some!';
+      noItems.className = 'text-gray-500 italic text-center col-span-full';
+      itemsContainer.appendChild(noItems);
+      return;
+    }
+
+    const filteredItems = items.filter(item =>
+      item.name && item.name.toLowerCase().includes(search)
+    );
+
+    if (filteredItems.length === 0) {
+      const noFound = document.createElement('p');
+      noFound.textContent = 'No matching items found.';
+      noFound.className = 'text-gray-500 italic text-center col-span-full';
+      itemsContainer.appendChild(noFound);
+      return;
+    }
+
+    filteredItems.forEach(item => {
+      itemsContainer.appendChild(renderShopItemCard(item));
+    });
+  }
+
+  // Render single item card
+  function renderShopItemCard(item) {
+    const card = document.createElement('article');
+    card.className = 'bg-white rounded-xl shadow-md flex flex-col cursor-default hover:shadow-xl focus-within:shadow-xl transition-shadow duration-300 outline-none';
+    card.tabIndex = 0;
+
+    // Defensive: Ensure pricePhp is a valid number
+    const price = (typeof item.pricePhp === 'number' && !isNaN(item.pricePhp)) ? item.pricePhp : 0;
+
+    card.setAttribute('aria-label', `Item: ${item.name || 'Unnamed'}, Price: ₱${price.toFixed(2)}`);
+
+    const imageWrapper = document.createElement('div');
+    imageWrapper.className = 'w-full aspect-[4/3] bg-blue-50 rounded-t-xl flex items-center justify-center overflow-hidden';
+    const img = document.createElement('img');
+    img.src = item.imageUrl || 'https://placehold.co/400x300?text=No+Image+Available&font=roboto';
+    img.alt = item.name || 'No name provided';
+    img.loading = 'lazy';
+    img.className = 'max-w-full max-h-full object-contain rounded-t-xl transition-transform duration-300 hover:scale-105';
+    imageWrapper.appendChild(img);
+
+    const details = document.createElement('div');
+    details.className = 'p-5 flex flex-col flex-grow text-center';
+
+    const nameEl = document.createElement('h2');
+    nameEl.className = 'text-xl font-extrabold text-gray-900 mb-2';
+    nameEl.textContent = item.name || 'Unnamed';
+
+    const descEl = document.createElement('p');
+    descEl.className = 'text-gray-600 text-sm mb-4 flex-grow';
+    descEl.textContent = item.description || '';
+
+    const priceEl = document.createElement('div');
+    priceEl.className = 'text-green-600 font-extrabold text-lg mb-5 select-none';
+    priceEl.textContent = `₱${price.toFixed(2)}`;
+
+    const controls = document.createElement('div');
+    controls.className = 'flex justify-center gap-4';
+
+    const detailsBtn = document.createElement('button');
+    detailsBtn.className = 'btn bg-blue-600 text-white font-semibold rounded-lg px-4 py-2 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-400 transition flex items-center gap-2';
+    detailsBtn.type = 'button';
+    detailsBtn.textContent = 'Details';
+    const detailsIcon = document.createElement('i');
+    detailsIcon.className = 'fas fa-search';
+    detailsBtn.appendChild(detailsIcon);
+    detailsBtn.setAttribute('aria-label', `View details for item ${item.name || 'Unnamed'}`);
+    detailsBtn.addEventListener('click', () => openDetailsModal(item));
+
+    const addToCartBtn = document.createElement('button');
+    addToCartBtn.className = 'btn bg-yellow-400 text-gray-900 font-semibold rounded-lg px-4 py-2 hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 transition flex items-center gap-2';
+    addToCartBtn.type = 'button';
+    addToCartBtn.textContent = 'Add to Cart';
+    const cartIcon = document.createElement('i');
+    cartIcon.className = 'fas fa-shopping-cart';
+    addToCartBtn.appendChild(cartIcon);
+    addToCartBtn.setAttribute('aria-label', `Add item ${item.name || 'Unnamed'} to cart`);
+    addToCartBtn.addEventListener('click', () => addToCart(item));
+
+    controls.appendChild(detailsBtn);
+    controls.appendChild(addToCartBtn);
+
+    details.appendChild(nameEl);
+    details.appendChild(descEl);
+    details.appendChild(priceEl);
+    details.appendChild(controls);
+
+    card.appendChild(imageWrapper);
+    card.appendChild(details);
+
+    return card;
+  }
+
+  // Render dashboard items
+  function renderDashboardItems() {
+    dashboardTableBody.innerHTML = '';
+    if (items.length === 0) {
+      const emptyRow = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 6;
+      td.className = 'text-center text-gray-500 italic py-6';
+      td.textContent = 'No items available. Please add some!';
+      emptyRow.appendChild(td);
+      dashboardTableBody.appendChild(emptyRow);
+      return;
+    }
+
+    items.forEach(item => {
+      const tr = document.createElement('tr');
+      tr.className = 'bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300';
+
+      const nameTd = document.createElement('td');
+      nameTd.textContent = item.name || 'Unnamed';
+      nameTd.className = 'font-semibold px-6 py-4';
+      tr.appendChild(nameTd);
+
+      const quantityTd = document.createElement('td');
+      quantityTd.textContent = item.quantity ?? '0';
+      quantityTd.className = 'px-6 py-4';
+      tr.appendChild(quantityTd);
+
+      const unitTd = document.createElement('td');
+      unitTd.textContent = item.unit || '';
+      unitTd.className = 'px-6 py-4';
+      tr.appendChild(unitTd);
+
+      // Defensive: Ensure pricePhp is a valid number
+      const price = (typeof item.pricePhp === 'number' && !isNaN(item.pricePhp)) ? item.pricePhp : 0;
+
+      const pricePhpTd = document.createElement('td');
+      pricePhpTd.textContent = `₱${price.toFixed(2)}`;
+      pricePhpTd.className = 'text-green-600 font-semibold px-6 py-4 select-none';
+      tr.appendChild(pricePhpTd);
+
+      const imageTd = document.createElement('td');
+      imageTd.className = 'px-6 py-4';
+      const img = document.createElement('img');
+      img.src = item.imageUrl || 'https://placehold.co/80x60?text=No+Image&font=roboto';
+      img.alt = item.name || 'Unnamed';
+      img.className = 'w-20 h-15 object-contain rounded-md';
+      imageTd.appendChild(img);
+      tr.appendChild(imageTd);
+
+      const actionsTd = document.createElement('td');
+      actionsTd.className = 'flex gap-4 px-6 py-4';
+
+      const editBtn = document.createElement('button');
+      editBtn.textContent = 'Edit ✏️';
+      editBtn.className = 'bg-blue-600 text-white font-semibold rounded-lg px-4 py-2 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-400 transition flex items-center gap-2';
+      editBtn.type = 'button';
+      editBtn.addEventListener('click', () => openEditModal(item));
+      editBtn.setAttribute('aria-label', `Edit item ${item.name || 'Unnamed'}`);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'Delete 🗑️';
+      deleteBtn.className = 'bg-red-600 text-white font-semibold rounded-lg px-4 py-2 hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-400 transition flex items-center gap-2';
+      deleteBtn.type = 'button';
+      deleteBtn.addEventListener('click', async () => {
+        if (confirm(`Are you sure you want to delete "${item.name || 'Unnamed'}"?`)) {
+          await deleteItem(item.id);
+          items = items.filter(it => it.id !== item.id);
+          renderDashboardItems();
+          renderShopItems(searchInput.value);
+          updateCartCount();
+        }
+      });
+      deleteBtn.setAttribute('aria-label', `Delete item ${item.name || 'Unnamed'}`);
+
+      const detailsBtn = document.createElement('button');
+      detailsBtn.textContent = 'Details 🔍';
+      detailsBtn.className = 'bg-yellow-400 text-gray-900 font-semibold rounded-lg px-4 py-2 hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 transition flex items-center gap-2';
+      detailsBtn.type = 'button';
+      detailsBtn.addEventListener('click', () => openDetailsModal(item));
+      detailsBtn.setAttribute('aria-label', `View details for item ${item.name || 'Unnamed'}`);
+
+      actionsTd.appendChild(editBtn);
+      actionsTd.appendChild(deleteBtn);
+      actionsTd.appendChild(detailsBtn);
+      tr.appendChild(actionsTd);
+
+      dashboardTableBody.appendChild(tr);
+    });
+  }
+
+  // Modal Handling: Add Item
+  function openAddItemModal() {
+    currentEditingItem = null;
+    addModalForm.reset();
+    addModalOverlay.classList.remove('hidden');
+    addModalOverlay.setAttribute('aria-hidden', 'false');
+    addModalCloseBtn.focus();
+  }
+
+  function closeAddItemModal() {
+    addModalOverlay.classList.add('hidden');
+    addModalOverlay.setAttribute('aria-hidden', 'true');
+  }
+
+  function openEditModal(item) {
+    currentEditingItem = item;
+    addNameInput.value = item.name || '';
+    addDescriptionInput.value = item.description || '';
+    addQuantityInput.value = item.quantity ?? '';
+    addUnitInput.value = item.unit || '';
+    addPricePhpInput.value = (typeof item.pricePhp === 'number' && !isNaN(item.pricePhp)) ? item.pricePhp : '';
+    addImageInput.value = item.imageUrl || '';
+    addModalOverlay.classList.remove('hidden');
+    addModalOverlay.setAttribute('aria-hidden', 'false');
+    addModalCloseBtn.focus();
+  }
+
+  addModalCloseBtn.addEventListener('click', closeAddItemModal);
+  addModalCancelBtn.addEventListener('click', closeAddItemModal);
+
+  // Modal Handling: Details
+  function openDetailsModal(item) {
+    modalTitle.textContent = item.name || 'Unnamed';
+    modalImage.src = item.imageUrl || 'https://placehold.co/400x300?text=No+Image+Available&font=roboto';
+    modalImage.alt = item.name || 'Unnamed';
+
+    modalDescription.textContent = item.description || 'No description available.';
+    modalQuantity.textContent = `Quantity: ${item.quantity ?? 0}`;
+    modalUnit.textContent = `Unit: ${item.unit || '-'}`;
+
+    const price = (typeof item.pricePhp === 'number' && !isNaN(item.pricePhp)) ? item.pricePhp : 0;
+    modalPricePhp.textContent = `Price (PHP): ₱${price.toFixed(2)}`;
+    detailsModalOverlay.classList.remove('hidden');
+    detailsModalOverlay.setAttribute('aria-hidden', 'false');
+
+    modalAddCartBtn.onclick = () => {
+      addToCart(item);
+      closeDetailsModal();
+    };
+  }
+
+  function closeDetailsModal() {
+    detailsModalOverlay.classList.add('hidden');
+    detailsModalOverlay.setAttribute('aria-hidden', 'true');
+    modalAddCartBtn.onclick = null;
+  }
+
+  detailsModalCloseBtn.addEventListener('click', closeDetailsModal);
+
+  // Add to cart logic
+  async function addToCart(item) {
+    item.cartCount = (item.cartCount || 0) + 1;
+    await putItem(item);
+    updateCartCount();
+    alert(`Added "${item.name || 'Unnamed'}" to cart. Total items: ${item.cartCount}`);
+  }
+
+  function updateCartCount() {
+    const totalCount = items.reduce((sum, item) => sum + (item.cartCount || 0), 0);
+    cartCountEl.textContent = totalCount;
+    cartCountEl.setAttribute('aria-label', `${totalCount} items in cart`);
+  }
+
+  // Submit handler for Add/Edit modal form
+  addModalForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // Validate inputs
+    const name = addNameInput.value.trim();
+    const description = addDescriptionInput.value.trim();
+    const quantity = parseInt(addQuantityInput.value);
+    const unit = addUnitInput.value.trim();
+    const pricePhp = parseFloat(addPricePhpInput.value);
+    const imageUrl = addImageInput.value.trim();
+
+    if (!name) {
+      alert('Please enter a valid item name.');
+      addNameInput.focus();
+      return;
+    }
+    if (isNaN(quantity) || quantity < 0) {
+      alert('Please enter a valid non-negative quantity.');
+      addQuantityInput.focus();
+      return;
+    }
+    if (!unit) {
+      alert('Please enter a valid unit.');
+      addUnitInput.focus();
+      return;
+    }
+    if (isNaN(pricePhp) || pricePhp < 0) {
+      alert('Please enter a valid non-negative price in PHP.');
+      addPricePhpInput.focus();
+      return;
+    }
+    if (!imageUrl) {
+      alert('Please enter a valid image URL.');
+      addImageInput.focus();
+      return;
+    }
+
+    const itemData = {
+      name,
+      description,
+      quantity,
+      unit,
+      pricePhp,
+      imageUrl,
+      id: currentEditingItem?.id,
+      cartCount: currentEditingItem?.cartCount || 0,
+    };
+
+    try {
+      if (currentEditingItem) {
+        // Update existing item
+        await putItem(itemData);
+        const index = items.findIndex(i => i.id === currentEditingItem.id);
+        if (index !== -1) items[index] = itemData;
+      } else {
+        // Add new item
+        const id = await putItem(itemData);
+        itemData.id = id;
+        items.push(itemData);
+      }
+      renderShopItems(searchInput.value);
+      renderDashboardItems();
+      updateCartCount();
+      closeAddItemModal();
+      currentEditingItem = null;
+    } catch (err) {
+      alert('Failed to save item: ' + err.message);
+    }
+  });
+
+  // Navigation event handlers
+  navShop.addEventListener('click', () => activateView('shop'));
+  navDashboard.addEventListener('click', () => {
+    if (isAuthenticated) {
+      activateView('dashboard');
+    } else {
+      openLoginModal();
+    }
+  });
+  navAbout.addEventListener('click', () => activateView('about'));
+
+  dashboardAddButton.addEventListener('click', openAddItemModal);
+
+  function activateView(viewName) {
+    if (viewName === 'shop') {
+      shopView.classList.remove('hidden');
+      dashboardView.classList.add('hidden');
+      aboutView.classList.add('hidden');
+      dashboardView.setAttribute('aria-hidden', 'true');
+      aboutView.setAttribute('aria-hidden', 'true');
+      shopView.setAttribute('aria-hidden', 'false');
+      navShop.setAttribute('aria-current', 'page');
+      navDashboard.removeAttribute('aria-current');
+      navAbout.removeAttribute('aria-current');
+    } else if (viewName === 'dashboard') {
+      dashboardView.classList.remove('hidden');
+      shopView.classList.add('hidden');
+      aboutView.classList.add('hidden');
+      dashboardView.setAttribute('aria-hidden', 'false');
+      aboutView.setAttribute('aria-hidden', 'true');
+      shopView.setAttribute('aria-hidden', 'true');
+      navDashboard.setAttribute('aria-current', 'page');
+      navShop.removeAttribute('aria-current');
+      navAbout.removeAttribute('aria-current');
+      renderDashboardItems();
+    } else if (viewName === 'about') {
+      dashboardView.classList.add('hidden');
+      shopView.classList.add('hidden');
+      aboutView.classList.remove('hidden');
+      aboutView.setAttribute('aria-hidden', 'false');
+      dashboardView.setAttribute('aria-hidden', 'true');
+      shopView.setAttribute('aria-hidden', 'true');
+      navAbout.setAttribute('aria-current', 'page');
+      navShop.removeAttribute('aria-current');
+      navDashboard.removeAttribute('aria-current');
+    }
+  }
+
+  // Login modal functions
+  function openLoginModal() {
+    loginError.textContent = '';
+    loginForm.reset();
+    loginModalOverlay.classList.remove('hidden');
+    loginModalOverlay.setAttribute('aria-hidden', 'false');
+    loginUsernameInput.focus();
+  }
+
+  function closeLoginModal() {
+    loginModalOverlay.classList.add('hidden');
+    loginModalOverlay.setAttribute('aria-hidden', 'true');
+    loginError.textContent = '';
+  }
+
+  loginModalCloseBtn.addEventListener('click', () => {
+    closeLoginModal();
+  });
+
+  loginModalOverlay.addEventListener('click', (e) => {
+    if (e.target === loginModalOverlay) {
+      closeLoginModal();
+    }
+  });
+
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = loginUsernameInput.value.trim();
+    const password = loginPasswordInput.value;
+
+    if (username === 'Admin' && password === 'Adminsassy') {
+      isAuthenticated = true;
+      closeLoginModal();
+      activateView('dashboard');
+    } else {
+      loginError.textContent = 'Invalid username or password.';
+      loginPasswordInput.value = '';
+      loginPasswordInput.focus();
+    }
+  });
+
+  // Initialize the application
+  async function init() {
+    try {
+      await openDB();
+      items = await loadItemsFromDB();
+      if (!items) items = [];
+      renderShopItems();
+      renderDashboardItems();
+      updateCartCount();
+    } catch (err) {
+      alert('Failed to open database: ' + err.message);
+      items = [];
+      renderShopItems();
+      renderDashboardItems();
+      updateCartCount();
+    }
+  }
+
+  searchInput.addEventListener('input', () => {
+    renderShopItems(searchInput.value);
+  });
+
+  init();
+})();
+  </script>
+</body>
+</html>
