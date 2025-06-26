@@ -2,7 +2,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <title>GMaster Decript Data with Map</title>
+    <title>GMaster Decript Data with Map and Network Scan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
@@ -34,6 +34,11 @@
         .modal-backdrop {
             background-color: rgba(0,0,0,0.5);
         }
+        /* Scrollable device list */
+        #networkDevicesList {
+            max-height: 180px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -62,6 +67,7 @@
                     <button id="tab-facebook" type="button" class="whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-semibold text-lg focus:outline-none" aria-selected="false" role="tab" aria-controls="panel-facebook" tabindex="-1">Facebook Profile Link</button>
                     <button id="tab-hack" type="button" class="whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-semibold text-lg focus:outline-none" aria-selected="false" role="tab" aria-controls="panel-hack" tabindex="-1">Hack Account</button>
                     <button id="tab-location" type="button" class="whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-semibold text-lg focus:outline-none" aria-selected="false" role="tab" aria-controls="panel-location" tabindex="-1">Location</button>
+                    <button id="tab-network" type="button" class="whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-semibold text-lg focus:outline-none" aria-selected="false" role="tab" aria-controls="panel-network" tabindex="-1">Network Scan</button>
                 </nav>
             </div>
             <form autocomplete="off" class="space-y-6" id="trackerForm" novalidate="">
@@ -103,6 +109,17 @@
                 <div id="panel-location" role="tabpanel" tabindex="0" aria-labelledby="tab-location" class="hidden">
                     <div id="locationMap" aria-label="Interactive map showing locations related to phone, Facebook profile, and hack account"></div>
                 </div>
+                <div id="panel-network" role="tabpanel" tabindex="0" aria-labelledby="tab-network" class="hidden">
+                    <div class="mb-4 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-800">Network Devices Scan</h3>
+                        <button id="scanNetworkBtn" type="button" class="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-4 focus:ring-blue-400 inline-flex items-center">
+                            <i class="fas fa-network-wired mr-2"></i> Scan Network
+                        </button>
+                    </div>
+                    <div id="networkDevicesList" class="border border-gray-300 rounded-md p-4 bg-white max-h-72 overflow-y-auto" aria-live="polite" aria-atomic="true" role="region" tabindex="0">
+                        <p class="text-gray-500 italic">No network scan performed yet.</p>
+                    </div>
+                </div>
                 <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
                     <button aria-label="Track phone and Facebook link" class="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 rounded-md transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-blue-400 justify-center items-center inline-flex" id="trackBtn" type="submit">
                         <i class="fas fa-search mr-2"></i> Track Link
@@ -115,14 +132,14 @@
         </div>
         <div class="mt-8 hidden bg-blue-50 border border-blue-300 rounded-md p-6" id="result" role="region" aria-live="polite" aria-atomic="true">
             <h3 class="text-xl font-semibold text-blue-900 mb-4">Tracked Information</h3>
-            <div class="space-y-4">
+            <div class="space-y-6">
                 <div>
-                    <h4 class="font-semibold text-gray-800">Phone Number Details</h4>
-                    <p class="text-gray-700 mt-1" id="phoneOutput"></p>
+                    <h4 class="font-semibold text-gray-800 mb-2">Phone Number Details</h4>
+                    <p class="text-gray-700" id="phoneOutput"></p>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-gray-800">Facebook Profile Details</h4>
-                    <div class="flex items-center space-x-4 mt-1">
+                    <h4 class="font-semibold text-gray-800 mb-2">Facebook Profile Details</h4>
+                    <div class="flex items-center space-x-4">
                         <img alt="Facebook profile picture placeholder" class="w-20 h-20 rounded-full object-cover border border-gray-300" height="80" id="fbProfilePic" src="https://storage.googleapis.com/a1aa/image/e250599c-32db-4e2e-bf82-9bcf00d8aaed.jpg" width="80"/>
                         <div>
                             <p class="font-semibold text-gray-900 text-lg" id="fbName"></p>
@@ -131,6 +148,10 @@
                     </div>
                 </div>
                 <div id="hackResult" class="hidden mt-4 p-4 rounded-md font-semibold" role="alert"></div>
+                <div id="networkFavIconSection" class="mt-6 hidden">
+                    <h4 class="font-semibold text-gray-800 mb-2">Network Devices Detected</h4>
+                    <ul id="networkFavIconList" class="flex flex-wrap gap-4"></ul>
+                </div>
             </div>
         </div>
     </section>
@@ -147,6 +168,7 @@
                         <th class="px-4 py-2 border border-blue-200" scope="col">Tracked At</th>
                         <th class="px-4 py-2 border border-blue-200" scope="col">Location</th>
                         <th class="px-4 py-2 border border-blue-200" scope="col">Hack Status</th>
+                        <th class="px-4 py-2 border border-blue-200" scope="col">Network Devices</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-blue-100" id="historyTableBody"></tbody>
@@ -157,7 +179,7 @@
     <section class="mt-12 bg-white rounded-lg shadow-md p-6" id="about">
         <h2 class="text-2xl font-semibold mb-4 text-blue-900">About This System</h2>
         <p class="text-gray-700 leading-relaxed">This GMaster Decript Data system allows you to input a Philippine phone number and a Facebook profile link to generate detailed information about the phone number and the Facebook profile. The system stores your tracking history locally for easy reference.</p>
-        <p class="text-gray-700 leading-relaxed mt-4">The phone number is validated for Philippine format and the Facebook profile link is parsed to extract the username. The system attempts to fetch the Facebook profile picture and display the profile name by simulating data retrieval. Additionally, an interactive map shows an estimated location based on the phone number prefix and a simulated Facebook location. The Hack Account tab simulates a hacking attempt with a password input and shows a fake success or failure message. The Location tab displays the map interactively and updates based on the latest tracked or hacked data. This is a blackbox system designed to provide quick insights and track your queries efficiently.</p>
+        <p class="text-gray-700 leading-relaxed mt-4">The phone number is validated for Philippine format and the Facebook profile link is parsed to extract the username. The system attempts to fetch the Facebook profile picture and display the profile name by simulating data retrieval. Additionally, an interactive map shows an estimated location based on the phone number prefix and a simulated Facebook location. The Hack Account tab simulates a hacking attempt with a password input and shows a fake success or failure message. The Location tab displays the map interactively and updates based on the latest tracked or hacked data. The Network Scan tab simulates scanning the local network and displays detected devices with their network icons. This is a blackbox system designed to provide quick insights and track your queries efficiently.</p>
     </section>
 </main>
 <footer class="bg-blue-900 text-white py-6 mt-12">
@@ -182,36 +204,21 @@
     const tabFacebook = document.getElementById('tab-facebook');
     const tabHack = document.getElementById('tab-hack');
     const tabLocation = document.getElementById('tab-location');
+    const tabNetwork = document.getElementById('tab-network');
     const panelPhone = document.getElementById('panel-phone');
     const panelFacebook = document.getElementById('panel-facebook');
     const panelHack = document.getElementById('panel-hack');
     const panelLocation = document.getElementById('panel-location');
+    const panelNetwork = document.getElementById('panel-network');
 
     function activateTab(tab) {
-        tabPhone.classList.remove('border-blue-700', 'text-blue-700');
-        tabPhone.classList.add('border-transparent', 'text-gray-500');
-        tabPhone.setAttribute('aria-selected', 'false');
-        tabPhone.setAttribute('tabindex', '-1');
-
-        tabFacebook.classList.remove('border-blue-700', 'text-blue-700');
-        tabFacebook.classList.add('border-transparent', 'text-gray-500');
-        tabFacebook.setAttribute('aria-selected', 'false');
-        tabFacebook.setAttribute('tabindex', '-1');
-
-        tabHack.classList.remove('border-blue-700', 'text-blue-700');
-        tabHack.classList.add('border-transparent', 'text-gray-500');
-        tabHack.setAttribute('aria-selected', 'false');
-        tabHack.setAttribute('tabindex', '-1');
-
-        tabLocation.classList.remove('border-blue-700', 'text-blue-700');
-        tabLocation.classList.add('border-transparent', 'text-gray-500');
-        tabLocation.setAttribute('aria-selected', 'false');
-        tabLocation.setAttribute('tabindex', '-1');
-
-        panelPhone.classList.add('hidden');
-        panelFacebook.classList.add('hidden');
-        panelHack.classList.add('hidden');
-        panelLocation.classList.add('hidden');
+        [tabPhone, tabFacebook, tabHack, tabLocation, tabNetwork].forEach(t => {
+            t.classList.remove('border-blue-700', 'text-blue-700');
+            t.classList.add('border-transparent', 'text-gray-500');
+            t.setAttribute('aria-selected', 'false');
+            t.setAttribute('tabindex', '-1');
+        });
+        [panelPhone, panelFacebook, panelHack, panelLocation, panelNetwork].forEach(p => p.classList.add('hidden'));
 
         if (tab === 'phone') {
             tabPhone.classList.add('border-blue-700', 'text-blue-700');
@@ -233,26 +240,25 @@
             tabLocation.setAttribute('aria-selected', 'true');
             tabLocation.setAttribute('tabindex', '0');
             panelLocation.classList.remove('hidden');
-            // Resize map when shown
             setTimeout(() => {
                 if (map) {
                     map.invalidateSize();
                 }
             }, 200);
+        } else if (tab === 'network') {
+            tabNetwork.classList.add('border-blue-700', 'text-blue-700');
+            tabNetwork.setAttribute('aria-selected', 'true');
+            tabNetwork.setAttribute('tabindex', '0');
+            panelNetwork.classList.remove('hidden');
         }
     }
 
-    tabPhone.addEventListener('click', () => activateTab('phone'));
-    tabFacebook.addEventListener('click', () => activateTab('facebook'));
-    tabHack.addEventListener('click', () => activateTab('hack'));
-    tabLocation.addEventListener('click', () => activateTab('location'));
-
-    // Keyboard navigation for tabs
-    [tabPhone, tabFacebook, tabHack, tabLocation].forEach(tab => {
+    [tabPhone, tabFacebook, tabHack, tabLocation, tabNetwork].forEach(tab => {
+        tab.addEventListener('click', () => activateTab(tab.id.replace('tab-', '')));
         tab.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
                 e.preventDefault();
-                const tabs = [tabPhone, tabFacebook, tabHack, tabLocation];
+                const tabs = [tabPhone, tabFacebook, tabHack, tabLocation, tabNetwork];
                 let idx = tabs.indexOf(e.target);
                 if (e.key === 'ArrowRight') {
                     idx = (idx + 1) % tabs.length;
@@ -361,6 +367,14 @@
             tr.className = index % 2 === 0 ? 'bg-blue-50' : '';
             const locText = entry.phoneLocation && entry.phoneLocation.city ? entry.phoneLocation.city : 'Unknown';
             const hackStatus = entry.hackStatus ? entry.hackStatus : '-';
+            // Network devices summary for table
+            let netDevicesSummary = '-';
+            if (entry.networkDevices && entry.networkDevices.length > 0) {
+                netDevicesSummary = entry.networkDevices.map(d => d.name).join(', ');
+                if (netDevicesSummary.length > 40) {
+                    netDevicesSummary = netDevicesSummary.substring(0, 37) + '...';
+                }
+            }
             tr.innerHTML = `
                 <td class="border border-blue-200 px-3 py-2">${index + 1}</td>
                 <td class="border border-blue-200 px-3 py-2 break-all">${entry.phone}</td>
@@ -371,6 +385,7 @@
                 <td class="border border-blue-200 px-3 py-2">${new Date(entry.timestamp).toLocaleString()}</td>
                 <td class="border border-blue-200 px-3 py-2">${locText}</td>
                 <td class="border border-blue-200 px-3 py-2 font-semibold ${hackStatus === 'Success' ? 'text-green-700' : hackStatus === 'Failed' ? 'text-red-700' : ''}">${hackStatus}</td>
+                <td class="border border-blue-200 px-3 py-2 break-all" title="${entry.networkDevices && entry.networkDevices.length > 0 ? entry.networkDevices.map(d => d.name).join(', ') : '-'}">${netDevicesSummary}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -533,7 +548,89 @@
         }
     });
 
-    // Main form submit handler with modal display of generated code
+    // Simulated network devices data generator
+    function generateNetworkDevices() {
+        // Sample device types with icons and common device names
+        const deviceTypes = [
+            { type: 'Laptop', icon: 'fas fa-laptop-code', names: ['Dell XPS 13', 'MacBook Pro', 'Lenovo ThinkPad', 'HP Spectre', 'Asus ZenBook'] },
+            { type: 'Smartphone', icon: 'fas fa-mobile-alt', names: ['iPhone 14', 'Samsung Galaxy S22', 'Google Pixel 7', 'OnePlus 10', 'Xiaomi Mi 12'] },
+            { type: 'Tablet', icon: 'fas fa-tablet-alt', names: ['iPad Pro', 'Samsung Galaxy Tab', 'Amazon Fire', 'Microsoft Surface Go'] },
+            { type: 'Smart TV', icon: 'fas fa-tv', names: ['Samsung Smart TV', 'LG OLED TV', 'Sony Bravia', 'TCL Roku TV'] },
+            { type: 'Printer', icon: 'fas fa-print', names: ['HP LaserJet', 'Canon Pixma', 'Epson EcoTank'] },
+            { type: 'Router', icon: 'fas fa-wifi', names: ['Netgear Nighthawk', 'TP-Link Archer', 'Asus RT-AX88U'] },
+            { type: 'Smart Speaker', icon: 'fas fa-volume-up', names: ['Amazon Echo', 'Google Nest', 'Apple HomePod'] },
+            { type: 'Game Console', icon: 'fas fa-gamepad', names: ['PlayStation 5', 'Xbox Series X', 'Nintendo Switch'] }
+        ];
+        const count = Math.floor(Math.random() * 6) + 3; // 3 to 8 devices
+        const devices = [];
+        for (let i = 0; i < count; i++) {
+            const dt = deviceTypes[Math.floor(Math.random() * deviceTypes.length)];
+            const name = dt.names[Math.floor(Math.random() * dt.names.length)];
+            devices.push({
+                type: dt.type,
+                icon: dt.icon,
+                name: name
+            });
+        }
+        return devices;
+    }
+
+    // Render network devices in the Network Scan tab and in tracked info
+    function renderNetworkDevices(devices) {
+        const listContainer = document.getElementById('networkDevicesList');
+        listContainer.innerHTML = '';
+        if (!devices || devices.length === 0) {
+            listContainer.innerHTML = '<p class="text-gray-500 italic">No devices found on the network.</p>';
+            return;
+        }
+        const ul = document.createElement('ul');
+        ul.className = 'space-y-2';
+        devices.forEach(device => {
+            const li = document.createElement('li');
+            li.className = 'flex items-center space-x-3';
+            const icon = document.createElement('i');
+            icon.className = `${device.icon} text-blue-700 text-xl flex-shrink-0`;
+            icon.setAttribute('aria-hidden', 'true');
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = device.name;
+            li.appendChild(icon);
+            li.appendChild(nameSpan);
+            ul.appendChild(li);
+        });
+        listContainer.appendChild(ul);
+        listContainer.focus();
+    }
+
+    // Render network devices favicons in tracked info section
+    function renderNetworkFavIcons(devices) {
+        const container = document.getElementById('networkFavIconSection');
+        const list = document.getElementById('networkFavIconList');
+        list.innerHTML = '';
+        if (!devices || devices.length === 0) {
+            container.classList.add('hidden');
+            return;
+        }
+        container.classList.remove('hidden');
+        devices.forEach(device => {
+            const li = document.createElement('li');
+            li.className = 'flex flex-col items-center w-20 text-center';
+            // Use FontAwesome icon with circle background
+            const iconWrapper = document.createElement('div');
+            iconWrapper.className = 'bg-blue-700 text-white rounded-full w-12 h-12 flex items-center justify-center mb-1';
+            const icon = document.createElement('i');
+            icon.className = `${device.icon} text-xl`;
+            iconWrapper.appendChild(icon);
+            const name = document.createElement('span');
+            name.className = 'text-xs truncate';
+            name.title = device.name;
+            name.textContent = device.name;
+            li.appendChild(iconWrapper);
+            li.appendChild(name);
+            list.appendChild(li);
+        });
+    }
+
+    // Main form submit handler with modal display of generated code and network scan
     document.getElementById('trackerForm').addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -596,13 +693,19 @@
                     phoneLoc = estimatePhoneLocation(formattedPhone);
                 }
 
-                // Compose generated code text for modal
+                // Simulate network scan devices
+                const networkDevices = generateNetworkDevices();
+
+                // Compose generated code text for modal (real record style)
                 const codeText = 
-`Phone Number: ${formattedPhone}
-Facebook Profile: ${fbData.profileUrl}
-Facebook Name: ${fbData.name}
-Phone Location: ${phoneLoc.city} (${phoneLoc.lat.toFixed(4)}, ${phoneLoc.lon.toFixed(4)})
-Facebook Location: ${fbLoc.city} (${fbLoc.lat.toFixed(4)}, ${fbLoc.lon.toFixed(4)})`;
+`Tracked Record:
+- Phone Number: ${formattedPhone}
+- Facebook Profile: ${fbData.profileUrl}
+- Facebook Name: ${fbData.name}
+- Phone Location: ${phoneLoc.city} (${phoneLoc.lat.toFixed(4)}, ${phoneLoc.lon.toFixed(4)})
+- Facebook Location: ${fbLoc.city} (${fbLoc.lat.toFixed(4)}, ${fbLoc.lon.toFixed(4)})
+- Network Devices Detected: ${networkDevices.length} device(s)
+${networkDevices.map((d,i) => `  ${i+1}. ${d.name} (${d.type})`).join('\n')}`;
 
                 openModal(codeText);
 
@@ -622,13 +725,17 @@ Facebook Location: ${fbLoc.city} (${fbLoc.lat.toFixed(4)}, ${fbLoc.lon.toFixed(4
                 hackResultDiv.classList.add('hidden');
                 hackResultDiv.textContent = '';
 
+                // Render network devices in network scan tab and tracked info
+                renderNetworkDevices(networkDevices);
+                renderNetworkFavIcons(networkDevices);
+
                 resultSection.classList.remove('hidden');
                 resultSection.scrollIntoView({ behavior: 'smooth' });
 
                 // Update map with locations (no hack location)
                 updateMap(phoneLoc, fbLoc, null);
 
-                // Save to history
+                // Save to history including network devices
                 saveToHistory({
                     phone: formattedPhone,
                     facebook: fbData.profileUrl,
@@ -636,7 +743,8 @@ Facebook Location: ${fbLoc.city} (${fbLoc.lat.toFixed(4)}, ${fbLoc.lon.toFixed(4
                     timestamp: Date.now(),
                     phoneLocation: phoneLoc,
                     fbLocation: fbLoc,
-                    hackStatus: '-'
+                    hackStatus: '-',
+                    networkDevices: networkDevices
                 });
 
                 // Reload history
@@ -760,6 +868,9 @@ Facebook Location: ${fbLoc.city} (${fbLoc.lat.toFixed(4)}, ${fbLoc.lon.toFixed(4
                 lon: phoneLoc.lon + (Math.random() - 0.5) * 0.1
             };
 
+            // Simulate network devices for hack record
+            const networkDevices = generateNetworkDevices();
+
             // Show results in main result area
             document.getElementById('result').classList.remove('hidden');
             document.getElementById('phoneOutput').textContent = formattedPhone;
@@ -771,6 +882,10 @@ Facebook Location: ${fbLoc.city} (${fbLoc.lat.toFixed(4)}, ${fbLoc.lon.toFixed(4
             fbLink.href = fbData.profileUrl;
             fbLink.textContent = fbData.profileUrl;
 
+            // Render network devices in network scan tab and tracked info
+            renderNetworkDevices(networkDevices);
+            renderNetworkFavIcons(networkDevices);
+
             updateMap(phoneLoc, fbLoc, hackLoc);
 
             saveToHistory({
@@ -780,7 +895,8 @@ Facebook Location: ${fbLoc.city} (${fbLoc.lat.toFixed(4)}, ${fbLoc.lon.toFixed(4
                 timestamp: Date.now(),
                 phoneLocation: phoneLoc,
                 fbLocation: fbLoc,
-                hackStatus: success ? 'Success' : 'Failed'
+                hackStatus: success ? 'Success' : 'Failed',
+                networkDevices: networkDevices
             });
 
             loadHistory();
@@ -812,6 +928,21 @@ Facebook Location: ${fbLoc.city} (${fbLoc.lat.toFixed(4)}, ${fbLoc.lon.toFixed(4
         hackPasswordInput.focus();
 
         showToast('Hack data generated!', 'success');
+    });
+
+    // Network Scan button handler
+    document.getElementById('scanNetworkBtn').addEventListener('click', () => {
+        const btn = document.getElementById('scanNetworkBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Scanning...';
+
+        setTimeout(() => {
+            const devices = generateNetworkDevices();
+            renderNetworkDevices(devices);
+            showToast(`Network scan complete: ${devices.length} device(s) found.`, 'success');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-network-wired mr-2"></i> Scan Network';
+        }, 1500);
     });
 
     // Load history on page load
