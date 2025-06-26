@@ -1,0 +1,851 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <title>GMaster Decript Data with Map</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+    <link crossorigin="" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+e2k0b+Q+6k6Q+6Q+6Q+6Q+6Q+6Q+6Q+6Q+6Q+6Q+6Q=" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #locationMap {
+            height: 320px;
+            border-radius: 0.5rem;
+            border: 1px solid #cbd5e1; /* Tailwind gray-300 */
+            margin-top: 1rem;
+        }
+        /* Responsive tabs: stack vertically on small screens */
+        @media (max-width: 640px) {
+            nav[aria-label="Tabs"] {
+                flex-wrap: wrap;
+            }
+            nav[aria-label="Tabs"] button {
+                flex: 1 1 50%;
+                text-align: center;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+                border-bottom-width: 3px !important;
+            }
+        }
+        /* Modal backdrop */
+        .modal-backdrop {
+            background-color: rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+<header class="bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-md">
+    <div class="container mx-auto px-4 py-5 flex flex-col md:flex-row items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <img alt="Logo icon with letters PT in white on blue background" class="w-12 h-12 rounded-full" height="48" src="https://storage.googleapis.com/a1aa/image/3c897f4d-fdc8-495f-5aec-870e7561f4d7.jpg" width="48"/>
+            <h1 class="text-2xl font-semibold tracking-wide">GMaster Decript Data</h1>
+        </div>
+        <nav class="mt-4 md:mt-0">
+            <ul class="flex space-x-6 text-sm font-medium">
+                <li><a class="hover:underline focus:underline" href="#tracker">Tracker</a></li>
+                <li><a class="hover:underline focus:underline" href="#history">History</a></li>
+                <li><a class="hover:underline focus:underline" href="#about">About</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
+    <section class="bg-white rounded-lg shadow-md p-6" id="tracker">
+        <h2 class="text-3xl font-semibold mb-6 text-center text-blue-900">GMaster Decript Data</h2>
+        <div>
+            <div class="border-b border-gray-300 mb-6">
+                <nav class="-mb-px flex space-x-8" aria-label="Tabs" role="tablist">
+                    <button id="tab-phone" type="button" class="whitespace-nowrap py-4 px-1 border-b-2 border-blue-700 text-blue-700 font-semibold text-lg focus:outline-none" aria-selected="true" role="tab" aria-controls="panel-phone" tabindex="0">Phone Number</button>
+                    <button id="tab-facebook" type="button" class="whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-semibold text-lg focus:outline-none" aria-selected="false" role="tab" aria-controls="panel-facebook" tabindex="-1">Facebook Profile Link</button>
+                    <button id="tab-hack" type="button" class="whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-semibold text-lg focus:outline-none" aria-selected="false" role="tab" aria-controls="panel-hack" tabindex="-1">Hack Account</button>
+                    <button id="tab-location" type="button" class="whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-semibold text-lg focus:outline-none" aria-selected="false" role="tab" aria-controls="panel-location" tabindex="-1">Location</button>
+                </nav>
+            </div>
+            <form autocomplete="off" class="space-y-6" id="trackerForm" novalidate="">
+                <div id="panel-phone" role="tabpanel" tabindex="0" aria-labelledby="tab-phone">
+                    <label class="block text-gray-700 font-semibold mb-2" for="phone">Phone Number</label>
+                    <input aria-describedby="phoneHelp" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" id="phone" name="phone" pattern="^(09|\+639)[0-9]{9}$" placeholder="09XXXXXXXXX or +639XXXXXXXXX" type="tel"/>
+                    <p class="text-xs text-gray-500 mt-1" id="phoneHelp">Enter a valid Philippine phone number starting with 09 or +639 followed by 9 digits.</p>
+                </div>
+                <div id="panel-facebook" role="tabpanel" tabindex="0" aria-labelledby="tab-facebook" class="hidden">
+                    <label class="block text-gray-700 font-semibold mb-2" for="facebook">Facebook Profile Link</label>
+                    <input aria-describedby="facebookHelp" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" id="facebook" name="facebook" pattern="https?://(www\.)?facebook\.com/.+" placeholder="https://www.facebook.com/username" type="url"/>
+                    <p class="text-xs text-gray-500 mt-1" id="facebookHelp">Enter a valid Facebook profile URL.</p>
+                </div>
+                <div id="panel-hack" role="tabpanel" tabindex="0" aria-labelledby="tab-hack" class="hidden space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2" for="hackPhone">Phone Number</label>
+                        <input aria-describedby="hackPhoneHelp" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent" id="hackPhone" name="hackPhone" pattern="^(09|\+639)[0-9]{9}$" placeholder="09XXXXXXXXX or +639XXXXXXXXX" type="tel"/>
+                        <p class="text-xs text-gray-500 mt-1" id="hackPhoneHelp">Enter a valid Philippine phone number starting with 09 or +639 followed by 9 digits.</p>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2" for="hackFacebook">Facebook Profile Link</label>
+                        <input aria-describedby="hackFacebookHelp" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent" id="hackFacebook" name="hackFacebook" pattern="https?://(www\.)?facebook\.com/.+" placeholder="https://www.facebook.com/username" type="url"/>
+                        <p class="text-xs text-gray-500 mt-1" id="hackFacebookHelp">Enter a valid Facebook profile URL.</p>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2" for="hackPassword">Password</label>
+                        <input aria-describedby="hackPasswordHelp" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent" id="hackPassword" name="hackPassword" placeholder="Enter password to attempt hack" type="password"/>
+                        <p class="text-xs text-gray-500 mt-1" id="hackPasswordHelp">Enter a password to simulate hacking attempt.</p>
+                    </div>
+                    <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
+                        <button aria-label="Attempt hack" class="flex-1 bg-red-700 hover:bg-red-800 text-white font-semibold py-3 rounded-md transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-red-400 justify-center items-center inline-flex" id="hackBtn" type="button">
+                            <i class="fas fa-lock-open mr-2"></i> Attempt Hack
+                        </button>
+                        <button aria-label="Generate hack data" class="flex-1 bg-yellow-700 hover:bg-yellow-800 text-white font-semibold py-3 rounded-md transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-yellow-400 justify-center items-center inline-flex" id="generateHackBtn" type="button">
+                            <i class="fas fa-magic mr-2"></i> Generate Hack Data
+                        </button>
+                    </div>
+                </div>
+                <div id="panel-location" role="tabpanel" tabindex="0" aria-labelledby="tab-location" class="hidden">
+                    <div id="locationMap" aria-label="Interactive map showing locations related to phone, Facebook profile, and hack account"></div>
+                </div>
+                <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
+                    <button aria-label="Track phone and Facebook link" class="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 rounded-md transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-blue-400 justify-center items-center inline-flex" id="trackBtn" type="submit">
+                        <i class="fas fa-search mr-2"></i> Track Link
+                    </button>
+                    <button aria-label="Generate phone and Facebook link data" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-semibold py-3 rounded-md transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-green-400 justify-center items-center inline-flex hidden" id="generateBtn" type="button">
+                        <i class="fas fa-cogs mr-2"></i> Generate Data
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="mt-8 hidden bg-blue-50 border border-blue-300 rounded-md p-6" id="result">
+            <h3 class="text-xl font-semibold text-blue-900 mb-4">Tracked Information</h3>
+            <div class="space-y-4">
+                <div>
+                    <h4 class="font-semibold text-gray-800">Phone Number Details</h4>
+                    <p class="text-gray-700 mt-1" id="phoneOutput"></p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-800">Facebook Profile Details</h4>
+                    <div class="flex items-center space-x-4 mt-1">
+                        <img alt="Facebook profile picture placeholder" class="w-20 h-20 rounded-full object-cover border border-gray-300" height="80" id="fbProfilePic" src="https://storage.googleapis.com/a1aa/image/e250599c-32db-4e2e-bf82-9bcf00d8aaed.jpg" width="80"/>
+                        <div>
+                            <p class="font-semibold text-gray-900 text-lg" id="fbName"></p>
+                            <a class="text-blue-700 hover:underline break-all" href="#" id="fbLink" rel="noopener noreferrer" target="_blank"></a>
+                        </div>
+                    </div>
+                </div>
+                <div id="hackResult" class="hidden mt-4 p-4 rounded-md font-semibold"></div>
+            </div>
+        </div>
+    </section>
+    <section class="mt-12" id="history">
+        <h2 class="text-2xl font-semibold mb-4 text-blue-900">Tracking History</h2>
+        <div class="bg-white rounded-lg shadow-md p-6 max-h-96 overflow-y-auto">
+            <table class="w-full table-auto border-collapse text-left text-gray-700">
+                <thead class="bg-blue-100 sticky top-0">
+                    <tr>
+                        <th class="px-4 py-2 border border-blue-200">#</th>
+                        <th class="px-4 py-2 border border-blue-200">Phone Number</th>
+                        <th class="px-4 py-2 border border-blue-200">Facebook Profile</th>
+                        <th class="px-4 py-2 border border-blue-200">Name</th>
+                        <th class="px-4 py-2 border border-blue-200">Tracked At</th>
+                        <th class="px-4 py-2 border border-blue-200">Location</th>
+                        <th class="px-4 py-2 border border-blue-200">Hack Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-blue-100" id="historyTableBody"></tbody>
+            </table>
+            <p class="text-center text-gray-500 mt-4" id="noHistory">No tracking history yet.</p>
+        </div>
+    </section>
+    <section class="mt-12 bg-white rounded-lg shadow-md p-6" id="about">
+        <h2 class="text-2xl font-semibold mb-4 text-blue-900">About This System</h2>
+        <p class="text-gray-700 leading-relaxed">This GMaster Decript Data system allows you to input a Philippine phone number and a Facebook profile link to generate detailed information about the phone number and the Facebook profile. The system stores your tracking history locally for easy reference.</p>
+        <p class="text-gray-700 leading-relaxed mt-4">The phone number is validated for Philippine format and the Facebook profile link is parsed to extract the username. The system attempts to fetch the Facebook profile picture and display the profile name by simulating data retrieval. Additionally, an interactive map shows an estimated location based on the phone number prefix and a simulated Facebook location. The Hack Account tab simulates a hacking attempt with a password input and shows a fake success or failure message. The Location tab displays the map interactively and updates based on the latest tracked or hacked data. This is a blackbox system designed to provide quick insights and track your queries efficiently.</p>
+    </section>
+</main>
+<footer class="bg-blue-900 text-white py-6 mt-12">
+    <div class="container mx-auto px-4 text-center text-sm">© 2024 GMaster Decript Data. All rights reserved.</div>
+</footer>
+
+<!-- Modal -->
+<div id="codeModal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4 p-6 relative">
+        <h3 id="modalTitle" class="text-xl font-semibold mb-4 text-blue-900">Generated Code</h3>
+        <pre id="modalCode" class="bg-gray-100 p-4 rounded text-sm overflow-x-auto max-h-64"></pre>
+        <button id="modalCloseBtn" class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 focus:outline-none" aria-label="Close modal">
+            <i class="fas fa-times fa-lg"></i>
+        </button>
+    </div>
+</div>
+
+<script crossorigin="" integrity="sha256-o9N1j6k6Q+6Q+6Q+6Q+6Q+6Q+6Q+6Q+6Q+6Q+6Q+6Q=" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Tab functionality
+    const tabPhone = document.getElementById('tab-phone');
+    const tabFacebook = document.getElementById('tab-facebook');
+    const tabHack = document.getElementById('tab-hack');
+    const tabLocation = document.getElementById('tab-location');
+    const panelPhone = document.getElementById('panel-phone');
+    const panelFacebook = document.getElementById('panel-facebook');
+    const panelHack = document.getElementById('panel-hack');
+    const panelLocation = document.getElementById('panel-location');
+
+    function activateTab(tab) {
+        tabPhone.classList.remove('border-blue-700', 'text-blue-700');
+        tabPhone.classList.add('border-transparent', 'text-gray-500');
+        tabPhone.setAttribute('aria-selected', 'false');
+        tabPhone.setAttribute('tabindex', '-1');
+
+        tabFacebook.classList.remove('border-blue-700', 'text-blue-700');
+        tabFacebook.classList.add('border-transparent', 'text-gray-500');
+        tabFacebook.setAttribute('aria-selected', 'false');
+        tabFacebook.setAttribute('tabindex', '-1');
+
+        tabHack.classList.remove('border-blue-700', 'text-blue-700');
+        tabHack.classList.add('border-transparent', 'text-gray-500');
+        tabHack.setAttribute('aria-selected', 'false');
+        tabHack.setAttribute('tabindex', '-1');
+
+        tabLocation.classList.remove('border-blue-700', 'text-blue-700');
+        tabLocation.classList.add('border-transparent', 'text-gray-500');
+        tabLocation.setAttribute('aria-selected', 'false');
+        tabLocation.setAttribute('tabindex', '-1');
+
+        panelPhone.classList.add('hidden');
+        panelFacebook.classList.add('hidden');
+        panelHack.classList.add('hidden');
+        panelLocation.classList.add('hidden');
+
+        if (tab === 'phone') {
+            tabPhone.classList.add('border-blue-700', 'text-blue-700');
+            tabPhone.setAttribute('aria-selected', 'true');
+            tabPhone.setAttribute('tabindex', '0');
+            panelPhone.classList.remove('hidden');
+        } else if (tab === 'facebook') {
+            tabFacebook.classList.add('border-blue-700', 'text-blue-700');
+            tabFacebook.setAttribute('aria-selected', 'true');
+            tabFacebook.setAttribute('tabindex', '0');
+            panelFacebook.classList.remove('hidden');
+        } else if (tab === 'hack') {
+            tabHack.classList.add('border-blue-700', 'text-blue-700');
+            tabHack.setAttribute('aria-selected', 'true');
+            tabHack.setAttribute('tabindex', '0');
+            panelHack.classList.remove('hidden');
+        } else if (tab === 'location') {
+            tabLocation.classList.add('border-blue-700', 'text-blue-700');
+            tabLocation.setAttribute('aria-selected', 'true');
+            tabLocation.setAttribute('tabindex', '0');
+            panelLocation.classList.remove('hidden');
+            // Resize map when shown
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize();
+                }
+            }, 200);
+        }
+    }
+
+    tabPhone.addEventListener('click', () => activateTab('phone'));
+    tabFacebook.addEventListener('click', () => activateTab('facebook'));
+    tabHack.addEventListener('click', () => activateTab('hack'));
+    tabLocation.addEventListener('click', () => activateTab('location'));
+
+    // Keyboard navigation for tabs
+    [tabPhone, tabFacebook, tabHack, tabLocation].forEach(tab => {
+        tab.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const tabs = [tabPhone, tabFacebook, tabHack, tabLocation];
+                let idx = tabs.indexOf(e.target);
+                if (e.key === 'ArrowRight') {
+                    idx = (idx + 1) % tabs.length;
+                } else {
+                    idx = (idx - 1 + tabs.length) % tabs.length;
+                }
+                activateTab(tabs[idx].id.replace('tab-', ''));
+                tabs[idx].focus();
+            }
+        });
+    });
+
+    // Utility: Format Philippine phone number for display
+    function formatPhoneNumber(phone) {
+        let cleaned = phone.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+        if (cleaned.startsWith('09')) {
+            cleaned = '+63' + cleaned.slice(1);
+        }
+        return cleaned;
+    }
+
+    // Simulate fetching Facebook profile data (blackbox)
+    function fetchFacebookProfileData(url) {
+        try {
+            const urlObj = new URL(url);
+            let path = urlObj.pathname.replace(/\//g, '');
+            if (!path) path = 'profile';
+            const name = path.split('.').join(' ').replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+            const initials = name.split(' ').map((w) => w[0]).join('').substring(0, 2).toUpperCase();
+            const profilePicUrl = `https://placehold.co/80x80/4267B2/FFFFFF?text=${encodeURIComponent(initials)}&font=Inter&font-weight=700&font-size=36`;
+            const fbLocations = [
+                { city: 'Manila', lat: 14.5995, lon: 120.9842 },
+                { city: 'Cebu City', lat: 10.3157, lon: 123.8854 },
+                { city: 'Davao City', lat: 7.1907, lon: 125.4553 },
+                { city: 'Quezon City', lat: 14.6760, lon: 121.0437 },
+                { city: 'Makati', lat: 14.5547, lon: 121.0244 },
+                { city: 'Baguio', lat: 16.4023, lon: 120.5960 },
+                { city: 'Iloilo City', lat: 10.7202, lon: 122.5621 },
+                { city: 'Zamboanga City', lat: 6.9214, lon: 122.0790 },
+                { city: 'Taguig', lat: 14.5176, lon: 121.0509 },
+                { city: 'Pasig', lat: 14.5764, lon: 121.0851 }
+            ];
+            const fbLoc = fbLocations[Math.floor(Math.random() * fbLocations.length)];
+            return { name: name || 'Facebook User', profilePicUrl, profileUrl: url, fbLocation: fbLoc };
+        } catch {
+            return {
+                name: 'Facebook User',
+                profilePicUrl: 'https://placehold.co/80x80/cccccc/000000?text=Profile+Pic',
+                profileUrl: url,
+                fbLocation: { city: 'Unknown', lat: 14.5995, lon: 120.9842 }
+            };
+        }
+    }
+
+    // Map initialization and marker management
+    let map, phoneMarker, fbMarker, hackMarker, lineBetween;
+    function initMap() {
+        if (map) return;
+        map = L.map('locationMap', { scrollWheelZoom: false }).setView([12.8797, 121.7740], 6);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+    }
+
+    // Estimate location from Philippine phone number prefix (blackbox)
+    function estimatePhoneLocation(phone) {
+        const cleaned = phone.replace(/\D/g, '');
+        const prefixMap = {
+            '917': { city: 'Manila', lat: 14.5995, lon: 120.9842 },
+            '918': { city: 'Cebu City', lat: 10.3157, lon: 123.8854 },
+            '919': { city: 'Davao City', lat: 7.1907, lon: 125.4553 },
+            '920': { city: 'Quezon City', lat: 14.6760, lon: 121.0437 },
+            '921': { city: 'Makati', lat: 14.5547, lon: 121.0244 },
+            '922': { city: 'Baguio', lat: 16.4023, lon: 120.5960 },
+            '923': { city: 'Iloilo City', lat: 10.7202, lon: 122.5621 },
+            '927': { city: 'Zamboanga City', lat: 6.9214, lon: 122.0790 },
+            '928': { city: 'Taguig', lat: 14.5176, lon: 121.0509 },
+            '929': { city: 'Pasig', lat: 14.5764, lon: 121.0851 }
+        };
+        let prefix = cleaned.startsWith('63') ? cleaned.substring(2, 5) : cleaned.startsWith('9') ? cleaned.substring(0, 3) : null;
+        return prefix && prefixMap[prefix] ? prefixMap[prefix] : { city: 'Philippines', lat: 12.8797, lon: 121.7740 };
+    }
+
+    // Save tracking history to localStorage
+    function saveToHistory(entry) {
+        const history = JSON.parse(localStorage.getItem('linkTrackerHistory')) || [];
+        history.unshift(entry);
+        if (history.length > 50) history.pop();
+        localStorage.setItem('linkTrackerHistory', JSON.stringify(history));
+    }
+
+    // Load tracking history from localStorage and render
+    function loadHistory() {
+        const history = JSON.parse(localStorage.getItem('linkTrackerHistory')) || [];
+        const tbody = document.getElementById('historyTableBody');
+        const noHistory = document.getElementById('noHistory');
+        tbody.innerHTML = '';
+        if (history.length === 0) {
+            noHistory.classList.remove('hidden');
+            return;
+        }
+        noHistory.classList.add('hidden');
+        history.forEach((entry, index) => {
+            const tr = document.createElement('tr');
+            tr.className = index % 2 === 0 ? 'bg-blue-50' : '';
+            const locText = entry.phoneLocation && entry.phoneLocation.city ? entry.phoneLocation.city : 'Unknown';
+            const hackStatus = entry.hackStatus ? entry.hackStatus : '-';
+            tr.innerHTML = `
+                <td class="border border-blue-200 px-3 py-2">${index + 1}</td>
+                <td class="border border-blue-200 px-3 py-2 break-all">${entry.phone}</td>
+                <td class="border border-blue-200 px-3 py-2 break-all">
+                    <a href="${entry.facebook}" target="_blank" rel="noopener noreferrer" class="text-blue-700 hover:underline">${entry.facebook}</a>
+                </td>
+                <td class="border border-blue-200 px-3 py-2">${entry.fbName}</td>
+                <td class="border border-blue-200 px-3 py-2">${new Date(entry.timestamp).toLocaleString()}</td>
+                <td class="border border-blue-200 px-3 py-2">${locText}</td>
+                <td class="border border-blue-200 px-3 py-2 font-semibold ${hackStatus === 'Success' ? 'text-green-700' : hackStatus === 'Failed' ? 'text-red-700' : ''}">${hackStatus}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Validate phone input
+    function validatePhone(phone) {
+        const phonePattern = /^(09|\+639)[0-9]{9}$/;
+        return phonePattern.test(phone);
+    }
+
+    // Validate facebook input
+    function validateFacebook(facebook) {
+        const facebookPattern = /^https?:\/\/(www\.)?facebook\.com\/.+/i;
+        return facebookPattern.test(facebook);
+    }
+
+    // Generate random Philippine phone number starting with 09 or +639
+    function generateRandomPhone() {
+        const prefix = Math.random() < 0.5 ? '09' : '+639';
+        let number = '';
+        for (let i = 0; i < 9; i++) {
+            number += Math.floor(Math.random() * 10);
+        }
+        return prefix + number;
+    }
+
+    // Generate random Facebook profile URL with random username
+    function generateRandomFacebook() {
+        const adjectives = ['cool', 'fast', 'smart', 'bright', 'happy', 'brave', 'kind', 'bold', 'sharp', 'quick'];
+        const nouns = ['lion', 'tiger', 'eagle', 'wolf', 'fox', 'bear', 'hawk', 'shark', 'panther', 'dragon'];
+        const randAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
+        const randNoun = nouns[Math.floor(Math.random() * nouns.length)];
+        const randNum = Math.floor(Math.random() * 9999);
+        const username = `${randAdj}${randNoun}${randNum}`;
+        return `https://www.facebook.com/${username}`;
+    }
+
+    // Update map markers and view with enhanced features
+    function updateMap(phoneLoc, fbLoc, hackLoc = null) {
+        initMap();
+
+        // Remove existing markers and line if they exist
+        if (phoneMarker) map.removeLayer(phoneMarker);
+        if (fbMarker) map.removeLayer(fbMarker);
+        if (hackMarker) map.removeLayer(hackMarker);
+        if (lineBetween) map.removeLayer(lineBetween);
+
+        // Custom phone marker icon (blue)
+        const phoneIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            shadowSize: [41, 41]
+        });
+
+        // Custom Facebook marker icon (violet)
+        const fbIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            shadowSize: [41, 41]
+        });
+
+        // Custom Hack marker icon (red)
+        const hackIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            shadowSize: [41, 41]
+        });
+
+        // Add phone location marker
+        phoneMarker = L.marker([phoneLoc.lat, phoneLoc.lon], {
+            title: `Phone Location: ${phoneLoc.city}`,
+            icon: phoneIcon
+        }).addTo(map)
+          .bindPopup(`<b>Phone Location</b><br>${phoneLoc.city}<br><small>Estimated from phone prefix</small>`)
+          .openPopup();
+
+        // Add Facebook location marker
+        fbMarker = L.marker([fbLoc.lat, fbLoc.lon], {
+            title: `Facebook Location: ${fbLoc.city}`,
+            icon: fbIcon
+        }).addTo(map)
+          .bindPopup(`<b>Facebook Location</b><br>${fbLoc.city}<br><small>Estimated from profile data</small>`);
+
+        // Add Hack location marker if available
+        if (hackLoc) {
+            hackMarker = L.marker([hackLoc.lat, hackLoc.lon], {
+                title: `Hack Location: ${hackLoc.city}`,
+                icon: hackIcon
+            }).addTo(map)
+              .bindPopup(`<b>Hack Location</b><br>${hackLoc.city}<br><small>Simulated hack location</small>`);
+        }
+
+        // Draw lines between markers if different locations
+        const points = [phoneMarker, fbMarker];
+        if (hackMarker) points.push(hackMarker);
+
+        if (points.length > 1) {
+            const latlngs = points.map(m => m.getLatLng());
+            lineBetween = L.polyline(latlngs, {color: 'red', dashArray: '5, 5', weight: 2}).addTo(map);
+        }
+
+        // Fit map bounds to markers with padding
+        const group = new L.featureGroup(points);
+        map.fitBounds(group.getBounds().pad(0.2));
+    }
+
+    // Display toast notification
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `fixed bottom-4 right-4 px-4 py-2 rounded-md text-white ${
+            type === 'error' ? 'bg-red-600' : type === 'success' ? 'bg-green-600' : 'bg-blue-600'
+        } shadow-lg transition-opacity duration-500 opacity-0`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        // Fade in
+        setTimeout(() => toast.classList.add('opacity-100'), 10);
+        
+        // Fade out and remove after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('opacity-100');
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
+    }
+
+    // Modal elements
+    const codeModal = document.getElementById('codeModal');
+    const modalCode = document.getElementById('modalCode');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+    function openModal(codeText) {
+        modalCode.textContent = codeText;
+        codeModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        modalCloseBtn.focus();
+    }
+    function closeModal() {
+        codeModal.classList.add('hidden');
+        document.body.style.overflow = '';
+        // Return focus to Track button
+        document.getElementById('trackBtn').focus();
+    }
+    modalCloseBtn.addEventListener('click', closeModal);
+    codeModal.addEventListener('click', (e) => {
+        if (e.target === codeModal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !codeModal.classList.contains('hidden')) {
+            closeModal();
+        }
+    });
+
+    // Main form submit handler with modal display of generated code
+    document.getElementById('trackerForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const activeTab = tabPhone.getAttribute('aria-selected') === 'true' ? 'phone' : tabFacebook.getAttribute('aria-selected') === 'true' ? 'facebook' : tabHack.getAttribute('aria-selected') === 'true' ? 'hack' : 'location';
+        const form = e.target;
+        const trackBtn = document.getElementById('trackBtn');
+        const originalBtnText = trackBtn.innerHTML;
+
+        if (activeTab === 'phone') {
+            const phoneInputRaw = form.phone.value.trim();
+            if (!phoneInputRaw) {
+                showToast('Please enter a phone number', 'error');
+                return;
+            }
+            if (!validatePhone(phoneInputRaw)) {
+                showToast('Please enter a valid Philippine phone number', 'error');
+                return;
+            }
+        } else if (activeTab === 'facebook') {
+            const facebookInput = form.facebook.value.trim();
+            if (!facebookInput) {
+                showToast('Please enter a Facebook profile link', 'error');
+                return;
+            }
+            if (!validateFacebook(facebookInput)) {
+                showToast('Please enter a valid Facebook profile URL', 'error');
+                return;
+            }
+        } else if (activeTab === 'hack') {
+            // Hack tab submit is disabled, handled by button click
+            return;
+        } else if (activeTab === 'location') {
+            // No form inputs in location tab
+            return;
+        }
+
+        // Show loading state on button
+        trackBtn.disabled = true;
+        trackBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Tracking...';
+
+        // Simulate asynchronous processing
+        setTimeout(() => {
+            try {
+                let formattedPhone = '';
+                let fbData = null;
+                let phoneLoc = null;
+                let fbLoc = null;
+
+                if (activeTab === 'phone') {
+                    const phoneInputRaw = form.phone.value.trim();
+                    formattedPhone = formatPhoneNumber(phoneInputRaw);
+                    fbData = fetchFacebookProfileData(generateRandomFacebook());
+                    phoneLoc = estimatePhoneLocation(formattedPhone);
+                    fbLoc = fbData.fbLocation;
+                } else if (activeTab === 'facebook') {
+                    const facebookInput = form.facebook.value.trim();
+                    fbData = fetchFacebookProfileData(facebookInput);
+                    fbLoc = fbData.fbLocation;
+                    formattedPhone = formatPhoneNumber(generateRandomPhone());
+                    phoneLoc = estimatePhoneLocation(formattedPhone);
+                }
+
+                // Compose generated code text for modal
+                const codeText = 
+`Phone Number: ${formattedPhone}
+Facebook Profile: ${fbData.profileUrl}
+Facebook Name: ${fbData.name}
+Phone Location: ${phoneLoc.city} (${phoneLoc.lat.toFixed(4)}, ${phoneLoc.lon.toFixed(4)})
+Facebook Location: ${fbLoc.city} (${fbLoc.lat.toFixed(4)}, ${fbLoc.lon.toFixed(4)})`;
+
+                openModal(codeText);
+
+                // Show results
+                const resultSection = document.getElementById('result');
+                document.getElementById('phoneOutput').textContent = formattedPhone;
+                const fbProfilePic = document.getElementById('fbProfilePic');
+                fbProfilePic.src = fbData.profilePicUrl;
+                fbProfilePic.alt = `Facebook profile picture of ${fbData.name}`;
+                document.getElementById('fbName').textContent = fbData.name;
+                const fbLink = document.getElementById('fbLink');
+                fbLink.href = fbData.profileUrl;
+                fbLink.textContent = fbData.profileUrl;
+
+                // Hide hack result if visible
+                const hackResultDiv = document.getElementById('hackResult');
+                hackResultDiv.classList.add('hidden');
+                hackResultDiv.textContent = '';
+
+                resultSection.classList.remove('hidden');
+                resultSection.scrollIntoView({ behavior: 'smooth' });
+
+                // Update map with locations (no hack location)
+                updateMap(phoneLoc, fbLoc, null);
+
+                // Save to history
+                saveToHistory({
+                    phone: formattedPhone,
+                    facebook: fbData.profileUrl,
+                    fbName: fbData.name,
+                    timestamp: Date.now(),
+                    phoneLocation: phoneLoc,
+                    fbLocation: fbLoc,
+                    hackStatus: '-'
+                });
+
+                // Reload history
+                loadHistory();
+
+                // Show Generate Data button only for phone/facebook tabs
+                if (activeTab === 'phone' || activeTab === 'facebook') {
+                    document.getElementById('generateBtn').classList.remove('hidden');
+                } else {
+                    document.getElementById('generateBtn').classList.add('hidden');
+                }
+
+                // Reset form inputs but keep focus on active input for convenience
+                if (activeTab === 'phone') {
+                    form.phone.value = '';
+                    form.phone.focus();
+                } else if (activeTab === 'facebook') {
+                    form.facebook.value = '';
+                    form.facebook.focus();
+                }
+
+                showToast('Tracking completed successfully!', 'success');
+            } catch (error) {
+                console.error('Tracking error:', error);
+                showToast('An error occurred during tracking', 'error');
+            } finally {
+                // Restore button state
+                trackBtn.disabled = false;
+                trackBtn.innerHTML = originalBtnText;
+            }
+        }, 1000); // Simulate network delay
+    });
+
+    // Generate Data button handler with improved UX
+    document.getElementById('generateBtn').addEventListener('click', (e) => {
+        const btn = e.target;
+        const originalBtnText = btn.innerHTML;
+
+        // Show loading state
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generating...';
+
+        // Simulate generation delay
+        setTimeout(() => {
+            try {
+                const genPhone = generateRandomPhone();
+                const genFacebook = generateRandomFacebook();
+
+                const phoneInput = document.getElementById('phone');
+                const facebookInput = document.getElementById('facebook');
+                phoneInput.value = genPhone;
+                facebookInput.value = genFacebook;
+
+                const form = document.getElementById('trackerForm');
+                form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+
+                showToast('Demo data generated successfully!', 'success');
+            } catch (error) {
+                console.error('Generation error:', error);
+                showToast('Failed to generate demo data', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnText;
+            }
+        }, 800);
+    });
+
+    // Hack Account functionality
+    const hackBtn = document.getElementById('hackBtn');
+    const generateHackBtn = document.getElementById('generateHackBtn');
+    const hackResultDiv = document.getElementById('hackResult');
+
+    hackBtn.addEventListener('click', () => {
+        const phoneInput = document.getElementById('hackPhone').value.trim();
+        const facebookInput = document.getElementById('hackFacebook').value.trim();
+        const passwordInput = document.getElementById('hackPassword').value;
+
+        if (!phoneInput || !facebookInput || !passwordInput) {
+            showToast('Please fill in all hack fields', 'error');
+            return;
+        }
+        if (!validatePhone(phoneInput)) {
+            showToast('Please enter a valid Philippine phone number', 'error');
+            return;
+        }
+        if (!validateFacebook(facebookInput)) {
+            showToast('Please enter a valid Facebook profile URL', 'error');
+            return;
+        }
+
+        hackResultDiv.classList.add('hidden');
+        hackResultDiv.textContent = '';
+
+        hackBtn.disabled = true;
+        hackBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Attempting...';
+
+        setTimeout(() => {
+            // Simulate hack success/failure randomly
+            const success = Math.random() < 0.3; // 30% chance success
+            if (success) {
+                hackResultDiv.textContent = `Hack successful! Password for ${facebookInput} is "${passwordInput}" (simulated).`;
+                hackResultDiv.classList.remove('bg-red-100', 'text-red-800', 'border-red-300');
+                hackResultDiv.classList.add('bg-green-100', 'text-green-800', 'border-green-300');
+            } else {
+                hackResultDiv.textContent = `Hack failed! Unable to retrieve password for ${facebookInput}.`;
+                hackResultDiv.classList.remove('bg-green-100', 'text-green-800', 'border-green-300');
+                hackResultDiv.classList.add('bg-red-100', 'text-red-800', 'border-red-300');
+            }
+            hackResultDiv.classList.remove('hidden');
+
+            // Save to history with hack status
+            const formattedPhone = formatPhoneNumber(phoneInput);
+            const fbData = fetchFacebookProfileData(facebookInput);
+            const phoneLoc = estimatePhoneLocation(formattedPhone);
+            const fbLoc = fbData.fbLocation;
+
+            // Simulate hack location near phone location with small random offset
+            const hackLoc = {
+                city: phoneLoc.city,
+                lat: phoneLoc.lat + (Math.random() - 0.5) * 0.1,
+                lon: phoneLoc.lon + (Math.random() - 0.5) * 0.1
+            };
+
+            // Show results in main result area
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('phoneOutput').textContent = formattedPhone;
+            const fbProfilePic = document.getElementById('fbProfilePic');
+            fbProfilePic.src = fbData.profilePicUrl;
+            fbProfilePic.alt = `Facebook profile picture of ${fbData.name}`;
+            document.getElementById('fbName').textContent = fbData.name;
+            const fbLink = document.getElementById('fbLink');
+            fbLink.href = fbData.profileUrl;
+            fbLink.textContent = fbData.profileUrl;
+
+            updateMap(phoneLoc, fbLoc, hackLoc);
+
+            saveToHistory({
+                phone: formattedPhone,
+                facebook: fbData.profileUrl,
+                fbName: fbData.name,
+                timestamp: Date.now(),
+                phoneLocation: phoneLoc,
+                fbLocation: fbLoc,
+                hackStatus: success ? 'Success' : 'Failed'
+            });
+
+            loadHistory();
+
+            hackBtn.disabled = false;
+            hackBtn.innerHTML = '<i class="fas fa-lock-open mr-2"></i> Attempt Hack';
+
+            showToast(success ? 'Hack attempt successful!' : 'Hack attempt failed!', success ? 'success' : 'error');
+        }, 1500);
+    });
+
+    generateHackBtn.addEventListener('click', () => {
+        const hackPhoneInput = document.getElementById('hackPhone');
+        const hackFacebookInput = document.getElementById('hackFacebook');
+        const hackPasswordInput = document.getElementById('hackPassword');
+
+        hackPhoneInput.value = generateRandomPhone();
+        hackFacebookInput.value = generateRandomFacebook();
+
+        // Generate a random password (8-12 chars)
+        const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+        let password = '';
+        const length = Math.floor(Math.random() * 5) + 8;
+        for (let i = 0; i < length; i++) {
+            password += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        hackPasswordInput.value = password;
+
+        hackPasswordInput.focus();
+
+        showToast('Hack data generated!', 'success');
+    });
+
+    // Load history on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        // Add clear history button if there's history
+        const noHistoryMsg = document.getElementById('noHistory');
+        if (localStorage.getItem('linkTrackerHistory')) {
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'mt-2 text-sm text-red-600 hover:text-red-800 font-medium';
+            clearBtn.innerHTML = '<i class="fas fa-trash-alt mr-1"></i> Clear History';
+            clearBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to delete all tracking history?')) {
+                    localStorage.removeItem('linkTrackerHistory');
+                    loadHistory();
+                    showToast('History cleared successfully', 'success');
+                }
+            });
+            noHistoryMsg.parentNode.insertBefore(clearBtn, noHistoryMsg.nextSibling);
+        }
+
+        loadHistory();
+        initMap();
+    });
+
+    // Add keyboard shortcut for Generate Data button
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'g') {
+            e.preventDefault();
+            const generateBtn = document.getElementById('generateBtn');
+            if (generateBtn && !generateBtn.classList.contains('hidden')) {
+                generateBtn.click();
+            }
+        }
+    });
+</script>
+</body>
+</html>
