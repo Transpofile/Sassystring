@@ -136,20 +136,28 @@
         <div class="mt-8 hidden bg-blue-50 border border-blue-200 rounded-md p-6" id="result" role="region" aria-live="polite">
             <h3 class="text-xl font-semibold text-blue-900 mb-4 border-b pb-2">Tracking Results</h3>
             <div id="hackResult" class="hidden mb-4 p-4 rounded-md font-semibold text-base" role="alert"></div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
                 <div>
                     <h4 class="font-semibold text-gray-800 mb-2 flex items-center"><i class="fas fa-phone-alt text-blue-700 mr-2"></i>Phone Number Details</h4>
                     <p class="text-gray-700 text-lg font-mono" id="phoneOutput"></p>
                 </div>
                 <div>
                     <h4 class="font-semibold text-gray-800 mb-2 flex items-center"><i class="fab fa-facebook text-blue-700 mr-2"></i>Facebook Profile Details</h4>
-                    <div class="flex items-center space-x-4">
-                        <img alt="Facebook profile picture" class="w-16 h-16 rounded-full object-cover border-2 border-gray-300" height="64" id="fbProfilePic" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" width="64"/>
-                        <div>
+                    <div class="flex items-start space-x-4">
+                        <img alt="Facebook profile picture" class="w-16 h-16 rounded-full object-cover border-2 border-gray-300 flex-shrink-0" height="64" id="fbProfilePic" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" width="64"/>
+                        <div class="flex-grow">
                             <p class="font-semibold text-gray-900 text-lg" id="fbName"></p>
-                            <a class="text-blue-700 hover:underline break-all text-sm" href="#" id="fbLink" rel="noopener noreferrer" target="_blank"></a>
+                             <!-- Enhanced: Links for app and web -->
+                            <div class="mt-2 flex items-center space-x-3">
+                                <a id="fbAppLink" href="#" rel="noopener noreferrer" target="_blank" title="Requires Facebook app to be installed" class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-md hover:bg-blue-700">
+                                    <i class="fab fa-facebook-messenger mr-1.5"></i> Open in App
+                                </a>
+                                <a id="fbWebLink" href="#" rel="noopener noreferrer" target="_blank" class="text-xs text-blue-700 hover:underline">View on Web</a>
+                            </div>
                         </div>
                     </div>
+                     <!-- Enhanced: Extra simulated details -->
+                    <div id="fbExtraDetails" class="mt-4 space-y-2 text-sm text-gray-700"></div>
                 </div>
             </div>
              <div id="networkFavIconSection" class="mt-6 hidden">
@@ -158,6 +166,7 @@
             </div>
         </div>
     </section>
+    <!-- ... (rest of the HTML is unchanged) ... -->
     <section class="mt-12" id="history">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-semibold text-blue-900">Tracking History</h2>
@@ -312,19 +321,31 @@ document.addEventListener('DOMContentLoaded', () => {
         return `https://www.facebook.com/${names[Math.floor(Math.random() * names.length)]}${Math.floor(Math.random() * 100)}`;
     };
 
+    // ENHANCEMENT: Generate richer, more realistic-looking data.
     const fetchFacebookProfileData = (url) => {
         try {
             const path = new URL(url).pathname.replace(/\//g, '');
             const name = path.split(/[\.\-_]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
             const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
             const profilePicUrl = `https://placehold.co/80x80/4267B2/FFFFFF?text=${encodeURIComponent(initials)}&font=Inter`;
+            
             const locations = [
                 { city: 'Manila', lat: 14.5995, lon: 120.9842 }, { city: 'Cebu City', lat: 10.3157, lon: 123.8854 },
                 { city: 'Davao City', lat: 7.1907, lon: 125.4553 }, { city: 'Quezon City', lat: 14.6760, lon: 121.0437 }
             ];
-            return { name, profilePicUrl, profileUrl: url, fbLocation: locations[Math.floor(Math.random() * locations.length)] };
+            const hometowns = ['Bacolod', 'Iloilo', 'Zamboanga', 'Taguig'];
+            const statuses = ['Single', 'In a relationship', 'It\'s complicated', 'Married'];
+
+            return { 
+                name, 
+                profilePicUrl, 
+                profileUrl: url, 
+                fbLocation: locations[Math.floor(Math.random() * locations.length)],
+                hometown: hometowns[Math.floor(Math.random() * hometowns.length)],
+                status: statuses[Math.floor(Math.random() * statuses.length)],
+            };
         } catch {
-            return { name: 'Invalid User', profilePicUrl: 'https://placehold.co/80x80/cccccc/000000?text=?', profileUrl: url, fbLocation: { city: 'Unknown', lat: 14.5995, lon: 120.9842 } };
+            return { name: 'Invalid User', profilePicUrl: 'https://placehold.co/80x80/cccccc/000000?text=?', profileUrl: url, fbLocation: { city: 'Unknown', lat: 14.5995, lon: 120.9842 }, hometown: 'N/A', status: 'N/A' };
         }
     };
 
@@ -435,14 +456,30 @@ document.addEventListener('DOMContentLoaded', () => {
         container.classList.remove('hidden');
     };
 
+    // ENHANCEMENT: This function now handles deep linking and richer data.
     const displayResults = (data) => {
         document.getElementById('phoneOutput').textContent = data.phone;
+        
+        // --- Facebook Profile Section ---
         document.getElementById('fbProfilePic').src = data.fbData.profilePicUrl;
         document.getElementById('fbProfilePic').alt = `Profile picture of ${data.fbData.name}`;
         document.getElementById('fbName').textContent = data.fbData.name;
-        document.getElementById('fbLink').href = data.fbData.profileUrl;
-        document.getElementById('fbLink').textContent = data.fbData.profileUrl.length > 40 ? data.fbData.profileUrl.substring(0, 37) + '...' : data.fbData.profileUrl;
         
+        // This is a "deep link". On mobile, it tells the OS to open the Facebook app.
+        // It's a standard feature and does not access any data, it just opens the app.
+        const appUrl = `fb://facewebmodal/f?href=${encodeURIComponent(data.fbData.profileUrl)}`;
+        document.getElementById('fbAppLink').href = appUrl;
+
+        // This is the standard web link, a fallback for desktop or if the app isn't installed.
+        document.getElementById('fbWebLink').href = data.fbData.profileUrl;
+
+        // Display the extra simulated details
+        const extraDetailsContainer = document.getElementById('fbExtraDetails');
+        extraDetailsContainer.innerHTML = `
+            <div class="flex items-center"><i class="fas fa-home text-gray-500 w-5 mr-2"></i> From <strong>${data.fbData.hometown}</strong></div>
+            <div class="flex items-center"><i class="fas fa-heart text-gray-500 w-5 mr-2"></i> ${data.fbData.status}</div>
+        `;
+
         const hackResultDiv = document.getElementById('hackResult');
         if (data.hackStatus) {
             const success = data.hackStatus === 'Success';
@@ -455,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderNetworkFavIcons(data.networkDevices);
         resultSection.classList.remove('hidden');
-        resultSection.scrollIntoView({ behavior: 'smooth' });
+        resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     const openModal = (codeText) => {
@@ -535,7 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveToHistory(data);
         renderNetworkDevicesList(currentNetworkDevices);
 
-        const codeText = `Record ID: ${Date.now()}\n- Phone: ${data.phone} (Est. Location: ${phoneLoc.city})\n- Facebook: ${data.fbData.name}\n- Profile URL: ${data.facebook}\n- Est. FB Location: ${data.fbData.fbLocation.city}\n- Network Devices Found: ${currentNetworkDevices.length}\n${currentNetworkDevices.map(d => `  - ${d.name} (${d.type})`).join('\n')}`;
+        const codeText = `Record ID: ${Date.now()}\n- Phone: ${data.phone} (Est. Location: ${phoneLoc.city})\n- Facebook: ${data.fbData.name}\n- Profile URL: ${data.facebook}\n- Est. FB Location: ${data.fbData.fbLocation.city}\n- Simulated Status: ${data.fbData.status}\n- Network Devices Found: ${currentNetworkDevices.length}\n${currentNetworkDevices.map(d => `  - ${d.name} (${d.type})`).join('\n')}`;
         openModal(codeText);
         
         toggleButtonState(trackBtn, false, '', originalBtnHTML);
