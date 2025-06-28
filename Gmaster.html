@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
     <link crossorigin="" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+e2k0b+U5bA82wz3oKzCofjK/gW/8dG/bJ9e2/epc=" rel="stylesheet"/>
+    <!-- ENHANCEMENT: Custom styles for better UX and UI polish -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -68,6 +69,7 @@
     <section class="bg-white rounded-lg shadow-md p-6" id="tracker">
         <h2 class="text-3xl font-semibold mb-6 text-center text-blue-900">GMaster Data Toolkit</h2>
         <div>
+            <!-- ENHANCEMENT: Reorganized tab structure for better workflow -->
             <div class="border-b border-gray-300 mb-6">
                 <nav class="-mb-px flex space-x-8" aria-label="Tabs" role="tablist">
                     <button id="tab-phone" type="button" class="whitespace-nowrap py-4 px-1 border-b-2 border-blue-700 text-blue-700 font-semibold text-lg" aria-selected="true" role="tab" aria-controls="panel-phone" tabindex="0">Phone Number</button>
@@ -77,17 +79,23 @@
                     <button id="tab-network" type="button" class="whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-semibold text-lg" aria-selected="false" role="tab" aria-controls="panel-network" tabindex="-1">Network Scan</button>
                 </nav>
             </div>
+
             <form autocomplete="off" class="space-y-6" id="trackerForm" novalidate="">
+                <!-- Panel 1: Phone -->
                 <div id="panel-phone" role="tabpanel" tabindex="0" aria-labelledby="tab-phone">
                     <label class="block text-gray-700 font-semibold mb-2" for="phone">Phone Number</label>
                     <input aria-describedby="phoneHelp" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:border-blue-500 focus:ring-blue-500" id="phone" name="phone" pattern="^(09|\+639)[0-9]{9}$" placeholder="e.g., 09171234567" type="tel"/>
                     <p class="text-xs text-gray-500 mt-1" id="phoneHelp">Enter a valid Philippine phone number.</p>
                 </div>
+
+                <!-- Panel 2: Facebook -->
                 <div id="panel-facebook" role="tabpanel" tabindex="0" aria-labelledby="tab-facebook" class="hidden">
                     <label class="block text-gray-700 font-semibold mb-2" for="facebook">Facebook Profile Link</label>
                     <input aria-describedby="facebookHelp" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:border-blue-500 focus:ring-blue-500" id="facebook" name="facebook" pattern="https?://(www\.)?facebook\.com/.+" placeholder="e.g., https://www.facebook.com/zuck" type="url"/>
                     <p class="text-xs text-gray-500 mt-1" id="facebookHelp">Enter a valid Facebook profile URL.</p>
                 </div>
+                
+                <!-- Panel 3: Hack Simulation -->
                 <div id="panel-hack" role="tabpanel" tabindex="0" aria-labelledby="tab-hack" class="hidden space-y-4">
                     <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800">
                         <p><i class="fas fa-exclamation-triangle mr-2"></i>This is a simulation for educational purposes only.</p>
@@ -109,11 +117,15 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Panel 4: Location Map -->
                 <div id="panel-location" role="tabpanel" tabindex="0" aria-labelledby="tab-location" class="hidden">
                     <div id="locationMap" aria-label="Interactive map showing locations"></div>
                 </div>
+                
+                <!-- Panel 5: Network Scan -->
                 <div id="panel-network" role="tabpanel" tabindex="0" aria-labelledby="tab-network" class="hidden">
-                    <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                     <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <h3 class="text-lg font-semibold text-gray-800">Local Network Devices</h3>
                         <button id="scanNetworkBtn" type="button" class="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-md inline-flex items-center disabled:bg-blue-400 w-full sm:w-auto justify-center">
                             <i class="fas fa-network-wired mr-2"></i> Scan Network
@@ -123,6 +135,8 @@
                         <p class="text-gray-500 italic">No network scan performed yet.</p>
                     </div>
                 </div>
+                
+                <!-- Action Buttons -->
                 <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
                     <button aria-label="Track phone and Facebook link" class="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 rounded-md transition-colors duration-300 justify-center items-center inline-flex disabled:bg-blue-400" id="trackBtn" type="submit">
                         <i class="fas fa-search-location mr-2"></i> Track Data
@@ -133,6 +147,7 @@
                 </div>
             </form>
         </div>
+        <!-- ENHANCEMENT: Result section is richer and better structured -->
         <div class="mt-8 hidden bg-blue-50 border border-blue-200 rounded-md p-6" id="result" role="region" aria-live="polite">
             <h3 class="text-xl font-semibold text-blue-900 mb-4 border-b pb-2">Tracking Results</h3>
             <div id="hackResult" class="hidden mb-4 p-4 rounded-md font-semibold text-base" role="alert"></div>
@@ -160,18 +175,20 @@
                     <div id="fbExtraDetails" class="mt-4 space-y-2 text-sm text-gray-700"></div>
                 </div>
             </div>
+             <!-- ENHANCEMENT: New section for network device icons -->
              <div id="networkFavIconSection" class="mt-6 hidden">
                 <h4 class="font-semibold text-gray-800 mb-3 flex items-center"><i class="fas fa-wifi text-blue-700 mr-2"></i>Detected Network Devices</h4>
                 <ul id="networkFavIconList" class="flex flex-wrap gap-4"></ul>
             </div>
         </div>
     </section>
-    <!-- ... (rest of the HTML is unchanged) ... -->
+
     <section class="mt-12" id="history">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-semibold text-blue-900">Tracking History</h2>
             <button id="clearHistoryBtn" class="text-sm text-red-600 hover:text-red-800 font-medium hidden"><i class="fas fa-trash-alt mr-1"></i> Clear History</button>
         </div>
+        <!-- ENHANCEMENT: Table is now responsive and has more columns -->
         <div class="bg-white rounded-lg shadow-md p-2 sm:p-6 max-h-96 overflow-y-auto">
             <div class="overflow-x-auto">
                 <table class="w-full table-auto border-collapse text-left text-gray-700" role="table" aria-label="Tracking history table">
@@ -191,6 +208,7 @@
             <p class="text-center text-gray-500 mt-4 py-4" id="noHistory">No tracking history yet.</p>
         </div>
     </section>
+
     <section class="mt-12 bg-white rounded-lg shadow-md p-6" id="about">
         <h2 class="text-2xl font-semibold mb-4 text-blue-900">About This System</h2>
         <p class="text-gray-700 leading-relaxed">This enhanced GMaster Data Toolkit simulates data retrieval and analysis from various sources. It provides a feature-rich interface to demonstrate concepts of data correlation, location tracking, and network scanning in a safe, simulated environment. All data is generated for demonstrative purposes and interactions are simulations of cloud-based services.</p>
@@ -212,10 +230,11 @@
 </div>
 
 <script crossorigin="" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- ENHANCEMENT: Completely rewritten and better-structured JavaScript -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- DOM Elements ---
+    // --- DOM Elements (Grouped for clarity) ---
     const tabElements = {
         phone: document.getElementById('tab-phone'),
         facebook: document.getElementById('tab-facebook'),
@@ -262,10 +281,12 @@ document.addEventListener('DOMContentLoaded', () => {
         tabElements[tabName].setAttribute('tabindex', '0');
         panelElements[tabName].classList.remove('hidden');
 
+        // Refresh map if it's visible but was initialized while hidden
         if (tabName === 'location' && map) {
             setTimeout(() => map.invalidateSize(), 100);
         }
 
+        // Show main action buttons only on relevant tabs
         const isActionTab = ['phone', 'facebook'].includes(tabName);
         trackBtn.style.display = isActionTab ? 'inline-flex' : 'none';
         generateBtn.style.display = isActionTab ? 'inline-flex' : 'none';
@@ -275,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tabElements[key].addEventListener('click', () => activateTab(key));
     });
 
-    // --- Utility Functions ---
+    // --- Utility Functions (Reusable helpers) ---
     const showToast = (message, type = 'info') => {
         const toast = document.createElement('div');
         const colors = {
@@ -286,7 +307,9 @@ document.addEventListener('DOMContentLoaded', () => {
         toast.className = `fixed bottom-4 right-4 px-4 py-2 rounded-md text-white ${colors[type]} shadow-lg transition-transform duration-300 transform translate-y-16 z-50`;
         toast.textContent = message;
         document.body.appendChild(toast);
+        // Animate in
         setTimeout(() => toast.classList.remove('translate-y-16'), 10);
+        // Animate out
         setTimeout(() => {
             toast.classList.add('translate-y-16');
             setTimeout(() => toast.remove(), 300);
@@ -345,19 +368,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 status: statuses[Math.floor(Math.random() * statuses.length)],
             };
         } catch {
+            // Return a default object for invalid URLs
             return { name: 'Invalid User', profilePicUrl: 'https://placehold.co/80x80/cccccc/000000?text=?', profileUrl: url, fbLocation: { city: 'Unknown', lat: 14.5995, lon: 120.9842 }, hometown: 'N/A', status: 'N/A' };
         }
     };
 
     const estimatePhoneLocation = (phone) => {
         const prefix = phone.substring(3, 6);
-        const prefixMap = {
+        const prefixMap = { // Simplified map of prefixes to major cities
             '917': { city: 'Makati', lat: 14.5547, lon: 121.0244 }, '918': { city: 'Pasig', lat: 14.5764, lon: 121.0851 },
             '919': { city: 'Baguio', lat: 16.4023, lon: 120.5960 }, '920': { city: 'Iloilo City', lat: 10.7202, lon: 122.5621 }
         };
         return prefixMap[prefix] || { city: 'Philippines', lat: 12.8797, lon: 121.7740 };
     };
     
+    // ENHANCEMENT: New function to simulate finding network devices
     const generateNetworkDevices = () => {
         const deviceTypes = [
             { type: 'Laptop', icon: 'fas fa-laptop-code', names: ['Dell XPS 13', 'MacBook Pro', 'ThinkPad T14'] },
@@ -386,8 +411,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updateMap = (locations) => {
         initMap();
+        // Clear previous layers
         [phoneMarker, fbMarker, hackMarker, lineBetween].forEach(layer => layer && map.removeLayer(layer));
         
+        // Define custom colored markers
         const icons = {
             phone: L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] }),
             fb: L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] }),
@@ -408,6 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
             markers.push(hackMarker);
         }
 
+        // Auto-zoom to fit all markers
         if (markers.length > 1) {
             lineBetween = L.polyline(markers.map(m => m.getLatLng()), { color: 'red', dashArray: '5, 5', weight: 2 }).addTo(map);
             map.fitBounds(L.featureGroup(markers).getBounds().pad(0.3));
@@ -466,11 +494,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('fbName').textContent = data.fbData.name;
         
         // This is a "deep link". On mobile, it tells the OS to open the Facebook app.
-        // It's a standard feature and does not access any data, it just opens the app.
         const appUrl = `fb://facewebmodal/f?href=${encodeURIComponent(data.fbData.profileUrl)}`;
         document.getElementById('fbAppLink').href = appUrl;
-
-        // This is the standard web link, a fallback for desktop or if the app isn't installed.
         document.getElementById('fbWebLink').href = data.fbData.profileUrl;
 
         // Display the extra simulated details
@@ -498,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const openModal = (codeText) => {
         modalCode.textContent = codeText;
         codeModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
         modalCloseBtn.focus();
     };
 
@@ -537,8 +562,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const saveToHistory = (entry) => {
         const history = JSON.parse(localStorage.getItem('gmasterHistory')) || [];
-        history.unshift(entry);
-        if (history.length > 50) history.pop();
+        history.unshift(entry); // Add to the beginning
+        if (history.length > 50) history.pop(); // Limit history size
         localStorage.setItem('gmasterHistory', JSON.stringify(history));
         loadHistory();
     };
@@ -619,6 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formattedPhone = formatPhoneNumber(phoneInput);
         const phoneLoc = estimatePhoneLocation(formattedPhone);
         const fbData = fetchFacebookProfileData(facebookInput);
+        // Simulate hack location near the phone's location
         const hackLoc = { ...phoneLoc, lat: phoneLoc.lat + (Math.random() - 0.5) * 0.1, lon: phoneLoc.lon + (Math.random() - 0.5) * 0.1 };
         currentNetworkDevices = generateNetworkDevices();
 
@@ -669,16 +695,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Modal and keyboard accessibility
     modalCloseBtn.addEventListener('click', closeModal);
     codeModal.addEventListener('click', (e) => (e.target === codeModal) && closeModal());
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && !codeModal.classList.contains('hidden')) closeModal();
+        // Add a fun shortcut
         if (e.ctrlKey && e.key === 'g') { e.preventDefault(); generateBtn.click(); }
     });
     
     // --- Initial Load ---
     loadHistory();
     initMap();
+    activateTab('phone'); // Ensure correct tab is active on load
 });
 </script>
 </body>
